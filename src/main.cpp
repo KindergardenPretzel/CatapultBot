@@ -16,7 +16,7 @@ controller Controller1 = controller(primary);
 motor MotorLF = motor(PORT20, ratio18_1, true);
 motor MotorLB = motor(PORT19, ratio18_1, true);
 motor MotorRF = motor(PORT11, ratio18_1, true);
-motor MotorRB = motor(PORT11, ratio18_1, true);
+motor MotorRB = motor(PORT12, ratio18_1, true);
 motor Shooter = motor(PORT5, ratio18_1, false);
 motor LeftWing = motor(PORT6, ratio18_1, false);
 motor RightWing = motor(PORT7, ratio18_1, false);
@@ -71,11 +71,34 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+void accurateTurnCW(int deg){
+    LeftMotors.setVelocity(50,pct);
+    RightMotors.setVelocity(50,pct);
+    //LeftMotors.spin(forward);
+    //RightMotors.spin(forward);
+    //MotorLF.spin(forward);
+    //MotorLB.spin(forward);
+    //MotorRF.spin(reverse);
+    //MotorRB.spin(reverse);  
+    waitUntil((DaInertial.rotation(degrees) >= deg));
+    //LeftMotors.stop();
+    //RightMotors.stop(); 
+    //MotorLB.stop();
+    //MotorLF.stop();
+    //MotorRB.stop();
+    //MotorRF.stop();
+
+}
+
 void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+
+  accurateTurnCW(90);
 }
+
+
 
 void event_Catapult(void){
       if (!ShootButtonPressed) {
@@ -152,14 +175,14 @@ void usercontrol(void) {
     LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
     RightMotors.spin(forward);
     LeftMotors.spin(forward);
-    //MotorLB.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
-    //MotorLF.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
-    //MotorRF.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
-    //MotorRB.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
-    //MotorRF.spin(forward);
-    //MotorRB.spin(forward);
-    //MotorLB.spin(forward);
-    //MotorLF.spin(forward);
+   // MotorLB.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
+   // MotorLF.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
+   // MotorRF.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
+  //  MotorRB.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
+  //  MotorRF.spin(forward);
+  //  MotorRB.spin(forward);
+  //  MotorLB.spin(forward);
+  //  MotorLF.spin(forward);
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
@@ -169,12 +192,13 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+  // Run the pre-autonomous function.
+  pre_auton();
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 
-  // Run the pre-autonomous function.
-  pre_auton();
+
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
