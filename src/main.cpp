@@ -143,7 +143,7 @@ void usercontrol(void) {
     MotorRB.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
     MotorRF.spin(forward);
     MotorRB.spin(forward);
-    MotorLB.spin(reverse);
+    MotorLB.spin(forward); // test1
     MotorLF.spin(forward);
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
