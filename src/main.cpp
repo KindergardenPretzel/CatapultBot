@@ -23,7 +23,8 @@ motor RightWing = motor(PORT7, ratio18_1, false);
 motor LIntake = motor(PORT1, ratio18_1, false);
 motor RIntake = motor(PORT2, ratio18_1, false);
 inertial DaInertial = inertial(PORT10);
-
+motor_group LeftMotors = motor_group(MotorLF, MotorLB);
+motor_group RightMotors = motor_group(MotorRF, MotorRB);
 // A global instance of competition
 competition Competition;
 
@@ -57,6 +58,7 @@ void pre_auton(void) {
     wait(20, msec);
   };
   Brain.Screen.clearScreen();
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -146,14 +148,18 @@ void usercontrol(void) {
   wait(15, msec);
   // User control code here, inside the loop
   while (1) {
-    MotorLB.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
-    MotorLF.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
-    MotorRF.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
-    MotorRB.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
-    MotorRF.spin(forward);
-    MotorRB.spin(forward);
-    MotorLB.spin(forward);
-    MotorLF.spin(forward);
+    RightMotors.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
+    LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
+    RightMotors.spin(forward);
+    LeftMotors.spin(forward);
+    //MotorLB.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
+    //MotorLF.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
+    //MotorRF.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
+    //MotorRB.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
+    //MotorRF.spin(forward);
+    //MotorRB.spin(forward);
+    //MotorLB.spin(forward);
+    //MotorLF.spin(forward);
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
