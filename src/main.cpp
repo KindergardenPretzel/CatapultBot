@@ -11,12 +11,18 @@
 
 using namespace vex;
 
+// A global instance of competition
+competition Competition;
+
+// define your global instances of motors and other devices here
+
+
 brain Brain;
 controller Controller1 = controller(primary);
 motor MotorLF = motor(PORT20, ratio18_1, true); // reversed 
 motor MotorLB = motor(PORT19, ratio18_1, true); // reversed
-motor MotorRF = motor(PORT11, ratio18_1, true); // forward direction
-motor MotorRB = motor(PORT12, ratio18_1, true); // forward direction
+motor MotorRF = motor(PORT11, ratio18_1, false); // forward direction
+motor MotorRB = motor(PORT12, ratio18_1, false); // forward direction
 motor Shooter = motor(PORT5, ratio18_1, false);
 motor LeftWing = motor(PORT6, ratio18_1, false);
 motor RightWing = motor(PORT7, ratio18_1, false);
@@ -27,79 +33,13 @@ motor_group LeftMotors = motor_group(MotorLF, MotorLB);
 motor_group RightMotors = motor_group(MotorRF, MotorRB);
 
 
-// A global instance of competition
-competition Competition;
+
 
 
 // Variables
 
 bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
-
-// define your global instances of motors and other devices here
-
-/*---------------------------------------------------------------------------*/
-/*                          Pre-Autonomous Functions                         */
-/*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
-/*---------------------------------------------------------------------------*/
-
-void pre_auton(void) {
-
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
-  DaInertial.calibrate();
-  Brain.Screen.print("Calibrating Inertial");
-  while (DaInertial.isCalibrating())
-  {
-    /* code */
-    wait(20, msec);
-  };
-  Brain.Screen.clearScreen();
-
-}
-
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              Autonomous Task                              */
-/*                                                                           */
-/*  This task is used to control your robot during the autonomous phase of   */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
-
-void accurateTurnCW(int deg){
-    LeftMotors.setVelocity(50,pct);
-    RightMotors.setVelocity(50,pct);
-    //LeftMotors.spin(forward);
-    //RightMotors.spin(forward);
-    //MotorLF.spin(forward);
-    //MotorLB.spin(forward);
-    //MotorRF.spin(reverse);
-    //MotorRB.spin(reverse);  
-    waitUntil((DaInertial.rotation(degrees) >= deg));
-    //LeftMotors.stop();
-    //RightMotors.stop(); 
-    //MotorLB.stop();
-    //MotorLF.stop();
-    //MotorRB.stop();
-    //MotorRF.stop();
-
-}
-
-void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
-
-  accurateTurnCW(90);
-}
-
 
 
 void event_Catapult(void){
@@ -155,6 +95,121 @@ void event_Outake(void){
   RIntake.stop();
 }
 
+
+void go_forward(void){
+  LeftMotors.spin(forward);
+  RightMotors.spin(forward); 
+}
+
+void go_backward(void){
+  LeftMotors.spin(reverse);
+  RightMotors.spin(reverse); 
+}
+
+void go_left(void){
+  LeftMotors.spin(reverse);
+  RightMotors.spin(forward); 
+}
+
+void go_right(void){
+  LeftMotors.spin(forward);
+  RightMotors.spin(reverse); 
+}
+
+void stop(void){
+  LeftMotors.stop();
+  RightMotors.stop(); 
+}
+
+
+
+void accurateTurnCW(double desired){
+  float Kp = 0.0842;
+  float error = 0;
+  float velocity;
+  DaInertial.setRotation(0, degrees);
+  while (DaInertial.rotation(degrees) <= desired) {
+    error = desired -  DaInertial.rotation(degrees);
+    velocity = Kp*error;
+    LeftMotors.spin(forward, velocity, voltageUnits::volt);
+    RightMotors.spin(forward, -velocity, voltageUnits::volt);
+    wait(20, msec);
+  }
+    LeftMotors.stop();
+    RightMotors.stop();
+}
+
+/*---------------------------------------------------------------------------*/
+/*                          Pre-Autonomous Functions                         */
+/*                                                                           */
+/*  You may want to perform some actions before the competition starts.      */
+/*  Do them in the following function.  You must return from this function   */
+/*  or the autonomous and usercontrol tasks will not be started.  This       */
+/*  function is only called once after the V5 has been powered on and        */
+/*  not every time that the robot is disabled.                               */
+/*---------------------------------------------------------------------------*/
+
+void pre_auton(void) {
+
+  // All activities that occur before the competition starts
+  // Example: clearing encoders, setting servo positions, ...
+  DaInertial.calibrate();
+  Brain.Screen.print("Calibrating Inertial");
+  while (DaInertial.isCalibrating())
+  {
+    /* code */
+    wait(20, msec);
+  };
+  Brain.Screen.clearScreen();
+
+}
+
+int ShowMeInfo(){
+  while (true) {
+    Brain.Screen.setCursor(4,1);
+    Brain.Screen.print("Inertial Heading");
+    Brain.Screen.setCursor(5,1);
+    Brain.Screen.print(DaInertial.heading(degrees));
+    Brain.Screen.setCursor(6,1);
+    Brain.Screen.print("Inertial Rotate");
+    Brain.Screen.setCursor(7,1);
+    Brain.Screen.print(DaInertial.rotation(degrees)); 
+    Brain.Screen.setCursor(8,1);
+    Brain.Screen.print(" Motors");
+    Brain.Screen.setCursor(9,1);
+    Brain.Screen.print(LeftMotors.position(rotationUnits::deg)); 
+    Brain.Screen.setCursor(10,1);
+    Brain.Screen.print(RightMotors.position(rotationUnits::raw)); 
+
+    wait(25, msec);
+  } 
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              Autonomous Task                              */
+/*                                                                           */
+/*  This task is used to control your robot during the autonomous phase of   */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+
+
+void autonomous(void) {
+  // ..........................................................................
+  // Insert autonomous user code here.
+  // ..........................................................................
+
+  vex::task MyTask(ShowMeInfo);
+  accurateTurnCW(90);
+  }
+
+
+
+
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -173,10 +228,10 @@ void usercontrol(void) {
   wait(15, msec);
   // User control code here, inside the loop
   while (1) {
-    RightMotors.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
+    RightMotors.setVelocity((Controller1.Axis3.position() - Controller1.Axis1.position()), percent);
     LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
-    RightMotors.spin(forward);
-    LeftMotors.spin(forward);
+    go_forward();
+    
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
