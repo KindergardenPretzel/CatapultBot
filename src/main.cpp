@@ -123,7 +123,7 @@ void stop(void){
 
 
 
-void accurateTurnCW(double desired){
+void TurnRight(double desired){
   float Kp = 0.0842;
   float error = 0;
   float velocity;
@@ -132,11 +132,41 @@ void accurateTurnCW(double desired){
     error = desired -  DaInertial.rotation(degrees);
     velocity = Kp*error;
     LeftMotors.spin(forward, velocity, voltageUnits::volt);
-    RightMotors.spin(forward, -velocity, voltageUnits::volt);
+    RightMotors.spin(reverse, velocity, voltageUnits::volt);
     wait(20, msec);
   }
     LeftMotors.stop();
     RightMotors.stop();
+}
+
+void TurnLeft(double desired){
+  float Kp = 0.0842;
+  float error = 0;
+  float velocity;
+  DaInertial.setRotation(0, degrees);
+  while (fabs(DaInertial.rotation(degrees)) <= desired) {
+    error = desired -  fabs(DaInertial.rotation(degrees));
+    velocity = Kp*error;
+    LeftMotors.spin(reverse, velocity, voltageUnits::volt);
+    RightMotors.spin(forward, velocity, voltageUnits::volt);
+    wait(20, msec);
+  }
+    LeftMotors.stop();
+    RightMotors.stop();
+}
+
+void MoveForward(void){
+  RightMotors.resetRotation();
+  LeftMotors.resetRotation();
+  float rotations;
+
+  while(rotation<=5)
+  {
+    LeftMotors.spin(forward, 3, voltageUnits::volt);
+    RightMotors.spin(forward, 3, voltageUnits::volt);
+    rotations = (LeftMotors.rotation(rev) + RightMotors.rotation(rev))/2;
+    wait(20,msec);
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -203,7 +233,10 @@ void autonomous(void) {
   // ..........................................................................
 
   vex::task MyTask(ShowMeInfo);
-  accurateTurnCW(90);
+  //TurnRight(90);
+  //wait(1,sec);
+  ///TurnLeft(90);
+    MoveForward();
   }
 
 
