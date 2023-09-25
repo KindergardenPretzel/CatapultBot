@@ -13,10 +13,10 @@ using namespace vex;
 
 brain Brain;
 controller Controller1 = controller(primary);
-motor MotorLF = motor(PORT20, ratio18_1, true);
-motor MotorLB = motor(PORT19, ratio18_1, true);
-motor MotorRF = motor(PORT11, ratio18_1, true);
-motor MotorRB = motor(PORT12, ratio18_1, true);
+motor MotorLF = motor(PORT20, ratio18_1, true); // reversed 
+motor MotorLB = motor(PORT19, ratio18_1, true); // reversed
+motor MotorRF = motor(PORT11, ratio18_1, true); // forward direction
+motor MotorRB = motor(PORT12, ratio18_1, true); // forward direction
 motor Shooter = motor(PORT5, ratio18_1, false);
 motor LeftWing = motor(PORT6, ratio18_1, false);
 motor RightWing = motor(PORT7, ratio18_1, false);
@@ -25,6 +25,8 @@ motor RIntake = motor(PORT2, ratio18_1, false);
 inertial DaInertial = inertial(PORT10);
 motor_group LeftMotors = motor_group(MotorLF, MotorLB);
 motor_group RightMotors = motor_group(MotorRF, MotorRB);
+
+
 // A global instance of competition
 competition Competition;
 
@@ -175,14 +177,7 @@ void usercontrol(void) {
     LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
     RightMotors.spin(forward);
     LeftMotors.spin(forward);
-   // MotorLB.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
-   // MotorLF.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
-   // MotorRF.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
-  //  MotorRB.setVelocity((Controller1.Axis1.position() - Controller1.Axis3.position()), percent);
-  //  MotorRF.spin(forward);
-  //  MotorRB.spin(forward);
-  //  MotorLB.spin(forward);
-  //  MotorLF.spin(forward);
+
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
