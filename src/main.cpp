@@ -155,18 +155,25 @@ void TurnLeft(double desired){
     RightMotors.stop();
 }
 
-void MoveForward(void){
-  RightMotors.resetRotation();
-  LeftMotors.resetRotation();
-  float rotations;
+void MoveForward(int cm){
+  // 1 revolution = 25.9207cm
+  // 60/34 Gear Ratio = 1.667
+  // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
+  // cm to degree ration is 360/43.20 = 8.334
+  RightMotors.resetPosition();
+  LeftMotors.resetPosition();
+  float degrees = 0;
+  float distanceToDrive = cm*8.334;
 
-  while(rotation<=5)
-  {
+  while(degrees<=distanceToDrive)
+  { 
     LeftMotors.spin(forward, 3, voltageUnits::volt);
     RightMotors.spin(forward, 3, voltageUnits::volt);
-    rotations = (LeftMotors.rotation(rev) + RightMotors.rotation(rev))/2;
-    wait(20,msec);
+    degrees = (LeftMotors.position(deg) + RightMotors.position(deg))/2;
+    Brain.Screen.setCursor(12,1);
+    Brain.Screen.print(degrees);
   }
+    stop();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -209,7 +216,7 @@ int ShowMeInfo(){
     Brain.Screen.setCursor(9,1);
     Brain.Screen.print(LeftMotors.position(rotationUnits::deg)); 
     Brain.Screen.setCursor(10,1);
-    Brain.Screen.print(RightMotors.position(rotationUnits::raw)); 
+    Brain.Screen.print(RightMotors.position(rotationUnits::deg)); 
 
     wait(25, msec);
   } 
@@ -235,8 +242,8 @@ void autonomous(void) {
   vex::task MyTask(ShowMeInfo);
   //TurnRight(90);
   //wait(1,sec);
-  ///TurnLeft(90);
-    MoveForward();
+  //TurnLeft(90);
+  MoveForward(50);
   }
 
 
