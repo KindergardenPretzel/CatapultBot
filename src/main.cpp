@@ -40,6 +40,13 @@ motor_group RightMotors = motor_group(MotorRF, MotorRB);
 
 bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
+  // 1 revolution = 25.9207cm
+  // 60/36 Gear Ratio
+  // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
+  // cm to degree ration is 360/43.20 = 8.334
+const float WHEEL_DIAMETER = 8.255; // cm
+const float WHEEL_CIRC = 3.14 * WHEEL_DIAMETER;
+const float GEAR_RATIO = 1.78;
 
 
 void event_Catapult(void){
@@ -156,22 +163,28 @@ void TurnLeft(double desired){
 }
 
 void MoveForward(int cm){
-  // 1 revolution = 25.9207cm
-  // 60/34 Gear Ratio = 1.667
-  // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
-  // cm to degree ration is 360/43.20 = 8.334
+  float Kp = 0.0842;
+  float error = 0;  
+  float velocity;
   RightMotors.resetPosition();
   LeftMotors.resetPosition();
   float degrees = 0;
-  float distanceToDrive = cm*8.334;
+  float DegreePerCm = (360 / WHEEL_CIRC) / GEAR_RATIO; 
+  float degreesToDrive = cm * DegreePerCm;
 
-  while(degrees<=distanceToDrive)
+  while(degrees<=degreesToDrive)
   { 
-    LeftMotors.spin(forward, 3, voltageUnits::volt);
-    RightMotors.spin(forward, 3, voltageUnits::volt);
     degrees = (LeftMotors.position(deg) + RightMotors.position(deg))/2;
-    Brain.Screen.setCursor(12,1);
+    error = degreesToDrive - degrees;
+    velocity = Kp*error;
+    LeftMotors.spin(forward, velocity, voltageUnits::volt);
+    RightMotors.spin(forward, velocity, voltageUnits::volt);
+    Brain.Screen.setCursor(11,1);
     Brain.Screen.print(degrees);
+    Brain.Screen.setCursor(12,1);
+    Brain.Screen.print(degreesToDrive);
+
+    wait(20,msec);
   }
     stop();
 }
