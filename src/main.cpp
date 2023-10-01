@@ -129,37 +129,48 @@ void stop(void){
 }
 
 
-
 void TurnRight(double desired){
-  float Kp = 0.0842;
+  float Kp = 0.076;
+  float Ki = 0.006;
   float error = 0;
   float velocity;
+  float integral = 0;
   DaInertial.setRotation(0, degrees);
-  while (DaInertial.rotation(degrees) <= desired) {
+  do {
     error = desired -  DaInertial.rotation(degrees);
-    velocity = Kp*error;
+    integral = integral + error;
+    if (fabs(error) > 20) {
+      integral = 0;
+    }
+    velocity = Kp*error + Ki*integral;
     LeftMotors.spin(forward, velocity, voltageUnits::volt);
     RightMotors.spin(reverse, velocity, voltageUnits::volt);
     wait(20, msec);
-  }
-    LeftMotors.stop();
-    RightMotors.stop();
+  } while ((DaInertial.rotation(degrees) < (desired - 0.4)) or (DaInertial.rotation(degrees) > (desired + 0.4)));
+    LeftMotors.stop(brake);
+    RightMotors.stop(brake);
 }
 
 void TurnLeft(double desired){
-  float Kp = 0.0842;
+  float Kp = 0.076;
+  float Ki = 0.005;
   float error = 0;
   float velocity;
+  float integral = 0;
   DaInertial.setRotation(0, degrees);
-  while (fabs(DaInertial.rotation(degrees)) <= desired) {
+  do {
     error = desired -  fabs(DaInertial.rotation(degrees));
-    velocity = Kp*error;
+    integral = integral + error;
+    if(fabs(error) > 20){
+      integral = 0;
+    }
+    velocity = Kp*error + Ki*integral;
     LeftMotors.spin(reverse, velocity, voltageUnits::volt);
     RightMotors.spin(forward, velocity, voltageUnits::volt);
     wait(20, msec);
-  }
-    LeftMotors.stop();
-    RightMotors.stop();
+    } while ((fabs(DaInertial.rotation(degrees)) < (desired - 0.4)) or (fabs(DaInertial.rotation(degrees)) > (desired + 0.4)));
+    LeftMotors.stop(brake);
+    RightMotors.stop(brake);
 }
 
 void MoveForward(int cm){
@@ -256,7 +267,14 @@ void autonomous(void) {
   //TurnRight(90);
   //wait(1,sec);
   //TurnLeft(90);
-  MoveForward(50);
+ // MoveForward(50);
+    TurnRight(90);
+    wait(100, msec);
+    TurnLeft(90);
+    wait(100, msec);
+    TurnRight(90);
+    wait(100, msec);
+    TurnLeft(90);
   }
 
 
