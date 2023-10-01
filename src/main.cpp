@@ -40,13 +40,14 @@ motor_group RightMotors = motor_group(MotorRF, MotorRB);
 
 bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
-  // 1 revolution = 25.9207cm
+  // 1 revolution = ~26cm
   // 60/36 Gear Ratio
   // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
   // cm to degree ration is 360/43.20 = 8.334
-const float WHEEL_DIAMETER = 8.255; // cm
-const float WHEEL_CIRC = 3.14 * WHEEL_DIAMETER;
-const float GEAR_RATIO = 1.78;
+float const WHEEL_DIAMETER = 8.3; // cm
+float const WHEEL_CIRC = WHEEL_DIAMETER * 3.14;
+float const GEAR_RATIO = 1.67;
+float const DEGREE_PER_CM = 360 / (WHEEL_CIRC * GEAR_RATIO);
 
 
 void event_Catapult(void){
@@ -129,76 +130,84 @@ void stop(void){
 }
 
 
-void TurnRight(double desired){
-  float Kp = 0.076;
-  float Ki = 0.006;
-  float error = 0;
-  float velocity;
+void TurnRight(int DegreesToTurn) {
+  // P control: error = degreeToTurn - current location
+  // Speeed = Kp * error
+  // PI control: integral = integral + error 
+  // speed = Kp * error + Ki * integral
+  float Kp = 0.4;
+  float Ki = 0.002;
+  float error;
+  float speed;
   float integral = 0;
-  DaInertial.setRotation(0, degrees);
+  DaInertial.resetRotation();
   do {
-    error = desired -  DaInertial.rotation(degrees);
+    wait(20, msec);
+    error = DegreesToTurn - DaInertial.rotation();
     integral = integral + error;
-    if (fabs(error) > 20) {
+    if(error >= 20){
       integral = 0;
     }
-    velocity = Kp*error + Ki*integral;
-    LeftMotors.spin(forward, velocity, voltageUnits::volt);
-    RightMotors.spin(reverse, velocity, voltageUnits::volt);
-    wait(20, msec);
-  } while ((DaInertial.rotation(degrees) < (desired - 0.4)) or (DaInertial.rotation(degrees) > (desired + 0.4)));
-    LeftMotors.stop(brake);
-    RightMotors.stop(brake);
+    speed = Kp * error + Ki * integral;
+    RightMotors.spin(reverse, speed, pct);
+    LeftMotors.spin(forward, speed, pct);
+  } while(DaInertial.rotation() > DegreesToTurn + 0.5 or DaInertial.rotation() < DegreesToTurn - 0.5);
+  RightMotors.stop(brake);
+  LeftMotors.stop(brake);
 }
 
-void TurnLeft(double desired){
-  float Kp = 0.076;
-  float Ki = 0.005;
-  float error = 0;
-  float velocity;
+void TurnLeft(int DegreesToTurn) {
+  // P control: error = degreeToTurn - current location
+  // Speeed = Kp * error
+  // PI control: integral = integral + error 
+  // speed = Kp * error + Ki * integral
+  float Kp = 0.4;
+  float Ki = 0.002;
+  float error;
+  float speed;
   float integral = 0;
-  DaInertial.setRotation(0, degrees);
+  DaInertial.resetRotation();
   do {
-    error = desired -  fabs(DaInertial.rotation(degrees));
+    wait(20, msec);
+    error = DegreesToTurn - fabs(DaInertial.rotation());
     integral = integral + error;
-    if(fabs(error) > 20){
+    if(error >= 20){
       integral = 0;
     }
-    velocity = Kp*error + Ki*integral;
-    LeftMotors.spin(reverse, velocity, voltageUnits::volt);
-    RightMotors.spin(forward, velocity, voltageUnits::volt);
-    wait(20, msec);
-    } while ((fabs(DaInertial.rotation(degrees)) < (desired - 0.4)) or (fabs(DaInertial.rotation(degrees)) > (desired + 0.4)));
-    LeftMotors.stop(brake);
-    RightMotors.stop(brake);
+    speed = Kp * error + Ki * integral;
+    RightMotors.spin(forward, speed, pct);
+    LeftMotors.spin(reverse, speed, pct);
+  } while(fabs(DaInertial.rotation()) > DegreesToTurn + 0.5 or fabs(DaInertial.rotation()) < DegreesToTurn - 0.5);
+  RightMotors.stop(brake);
+  LeftMotors.stop(brake);
 }
 
-void MoveForward(int cm){
-  float Kp = 0.0842;
-  float error = 0;  
-  float velocity;
+void drive_forward(int distanceToDrive){
+  float Kp = 0.7;
+  float Ki = 0.02;
+  float integral = 0;
+  float error;
+  float currentDegree;
+  float speed;
+  float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
   RightMotors.resetPosition();
   LeftMotors.resetPosition();
-  float degrees = 0;
-  float DegreePerCm = (360 / WHEEL_CIRC) / GEAR_RATIO; 
-  float degreesToDrive = cm * DegreePerCm;
-
-  while(degrees<=degreesToDrive)
-  { 
-    degrees = (LeftMotors.position(deg) + RightMotors.position(deg))/2;
-    error = degreesToDrive - degrees;
-    velocity = Kp*error;
-    LeftMotors.spin(forward, velocity, voltageUnits::volt);
-    RightMotors.spin(forward, velocity, voltageUnits::volt);
-    Brain.Screen.setCursor(11,1);
-    Brain.Screen.print(degrees);
-    Brain.Screen.setCursor(12,1);
-    Brain.Screen.print(degreesToDrive);
-
+  do {
     wait(20,msec);
-  }
-    stop();
+    currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
+    error = distanceToDrive - (currentDegree / DEGREE_PER_CM);
+    integral = integral + error;
+    if(error >= 20){  // ~15cm
+      integral = 0;
+    }
+    speed = error * Kp + Ki * integral;
+    RightMotors.spin(forward, speed, pct);
+    LeftMotors.spin(forward, speed, pct);
+  } while(currentDegree < degreeToDrive);
+  RightMotors.stop(brake);
+  LeftMotors.stop(brake);
 }
+
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -275,6 +284,8 @@ void autonomous(void) {
     TurnRight(90);
     wait(100, msec);
     TurnLeft(90);
+    wait(100, msec);
+    drive_forward(30);
   }
 
 
