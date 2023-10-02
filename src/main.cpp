@@ -130,7 +130,7 @@ void stop(void){
 }
 
 
-void TurnRight(int DegreesToTurn, int VelocityMax) {
+void turn_right(int DegreesToTurn, int VelocityMax) {
   // P control: error = degreeToTurn - current location
   // Speeed = Kp * error
   // PI control: integral = integral + error 
@@ -159,13 +159,13 @@ void TurnRight(int DegreesToTurn, int VelocityMax) {
   LeftMotors.stop(brake);
 }
 
-void TurnLeft(int DegreesToTurn) {
+void turn_left(int DegreesToTurn, int VelocityMax) {
   // P control: error = degreeToTurn - current location
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
   float Kp = 0.4;
-  float Ki = 0.002;
+  float Ki = 0.0015;
   float error;
   float speed;
   float integral = 0;
@@ -178,6 +178,9 @@ void TurnLeft(int DegreesToTurn) {
       integral = 0;
     }
     speed = Kp * error + Ki * integral;
+    if (speed > VelocityMax) {
+      speed = VelocityMax;
+    }
     RightMotors.spin(forward, speed, pct);
     LeftMotors.spin(reverse, speed, pct);
   } while(fabs(DaInertial.rotation()) > DegreesToTurn + 0.5 or fabs(DaInertial.rotation()) < DegreesToTurn - 0.5);
@@ -185,7 +188,7 @@ void TurnLeft(int DegreesToTurn) {
   LeftMotors.stop(brake);
 }
 
-void drive_forward(int distanceToDrive){
+void drive_forward(int distanceToDrive, int VelocityMax){
   float Kp = 0.7;
   float Ki = 0.02;
   float integral = 0;
@@ -204,6 +207,9 @@ void drive_forward(int distanceToDrive){
       integral = 0;
     }
     speed = error * Kp + Ki * integral;
+    if (speed > VelocityMax) {
+      speed = VelocityMax;
+    }
     RightMotors.spin(forward, speed, pct);
     LeftMotors.spin(forward, speed, pct);
   } while(currentDegree < degreeToDrive);
@@ -211,6 +217,41 @@ void drive_forward(int distanceToDrive){
   LeftMotors.stop(brake);
 }
 
+void drive_backward(int distanceToDrive, int VelocityMax){
+  float Kp = 0.7;
+  float Ki = 0.02;
+  float integral = 0;
+  float error;
+  float currentDegree;
+  float speed;
+  float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
+  RightMotors.resetPosition();
+  LeftMotors.resetPosition();
+  do {
+    wait(20,msec);
+    currentDegree = (abs(RightMotors.position(deg)) + abs(LeftMotors.position(deg))) / 2;
+    error = distanceToDrive - (currentDegree / DEGREE_PER_CM);
+    integral = integral + error;
+    if(error >= 20){  // ~15cm
+      integral = 0;
+    }
+    speed = error * Kp + Ki * integral;
+    if (speed > VelocityMax) {
+      speed = VelocityMax;
+    }
+    RightMotors.spin(reverse, speed, pct);
+    LeftMotors.spin(reverse, speed, pct);
+  } while(currentDegree < degreeToDrive);
+  RightMotors.stop(brake);
+  LeftMotors.stop(brake);
+}
+
+void outake(void){
+  LIntake.spinFor(reverse, 1, vex::timeUnits::sec, 100, vex::velocityUnits::pct);
+  RIntake.spinFor(forward, 1, vex::timeUnits::sec, 100, vex::velocityUnits::pct);
+  LIntake.stop();
+  RIntake.stop();
+}
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -275,16 +316,14 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-
-    TurnRight(90, 30);
-    wait(200, msec);
-    TurnRight(90, 30);
-    wait(200, msec);
-    TurnRight(90, 30);
-    wait(200, msec);
-    TurnRight(90, 30);
-    //wait(100, msec);
-    //drive_forward(30);
+   drive_forward(150, 60);
+   wait(20, msec);
+   turn_left(90, 50);
+   wait(20, msec);
+   drive_forward(20, 30);
+   outake();
+   drive_backward(20, 30);
+   turn_left(90, 50);
   }
 
 
