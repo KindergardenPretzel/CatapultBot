@@ -130,13 +130,13 @@ void stop(void){
 }
 
 
-void TurnRight(int DegreesToTurn) {
+void TurnRight(int DegreesToTurn, int VelocityMax) {
   // P control: error = degreeToTurn - current location
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
   float Kp = 0.4;
-  float Ki = 0.002;
+  float Ki = 0.0015; // was 0.002
   float error;
   float speed;
   float integral = 0;
@@ -149,10 +149,13 @@ void TurnRight(int DegreesToTurn) {
       integral = 0;
     }
     speed = Kp * error + Ki * integral;
+    if (speed > VelocityMax) {
+      speed = VelocityMax;
+    }
     RightMotors.spin(reverse, speed, pct);
     LeftMotors.spin(forward, speed, pct);
-  } while(DaInertial.rotation() > DegreesToTurn + 0.5 or DaInertial.rotation() < DegreesToTurn - 0.5);
-  RightMotors.stop(brake);
+  } while(DaInertial.rotation() > DegreesToTurn + 0.3 or DaInertial.rotation() < DegreesToTurn - 0.3);
+  RightMotors.stop();
   LeftMotors.stop(brake);
 }
 
@@ -271,21 +274,17 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-
   vex::task MyTask(ShowMeInfo);
-  //TurnRight(90);
-  //wait(1,sec);
-  //TurnLeft(90);
- // MoveForward(50);
-    TurnRight(90);
-    wait(100, msec);
-    TurnLeft(90);
-    wait(100, msec);
-    TurnRight(90);
-    wait(100, msec);
-    TurnLeft(90);
-    wait(100, msec);
-    drive_forward(30);
+
+    TurnRight(90, 30);
+    wait(200, msec);
+    TurnRight(90, 30);
+    wait(200, msec);
+    TurnRight(90, 30);
+    wait(200, msec);
+    TurnRight(90, 30);
+    //wait(100, msec);
+    //drive_forward(30);
   }
 
 
