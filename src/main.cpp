@@ -316,14 +316,14 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-   drive_forward(150, 60);
+   drive_forward(120, 80);
    wait(20, msec);
-   turn_left(90, 50);
+   turn_left(90, 70);
    wait(20, msec);
-   drive_forward(20, 30);
+   drive_forward(20, 40);
    outake();
-   drive_backward(20, 30);
-   turn_left(90, 50);
+   drive_backward(20, 40);
+   turn_left(70, 70);
   }
 
 
