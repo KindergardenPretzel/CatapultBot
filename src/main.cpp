@@ -189,7 +189,7 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
 }
 
 void drive_forward(int distanceToDrive, int VelocityMax){
-  float Kp = 0.7;
+  float Kp = 0.2;
   float Ki = 0.02;
   float integral = 0;
   float error;
@@ -201,9 +201,9 @@ void drive_forward(int distanceToDrive, int VelocityMax){
   do {
     wait(20,msec);
     currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
-    error = distanceToDrive - (currentDegree / DEGREE_PER_CM);
+    error = degreeToDrive - currentDegree;
     integral = integral + error;
-    if(error >= 20){  // ~15cm
+    if(error >= 70){  // ~15cm
       integral = 0;
     }
     speed = error * Kp + Ki * integral;
@@ -218,7 +218,7 @@ void drive_forward(int distanceToDrive, int VelocityMax){
 }
 
 void drive_backward(int distanceToDrive, int VelocityMax){
-  float Kp = 0.7;
+  float Kp = 0.2;
   float Ki = 0.02;
   float integral = 0;
   float error;
@@ -230,9 +230,9 @@ void drive_backward(int distanceToDrive, int VelocityMax){
   do {
     wait(20,msec);
     currentDegree = (abs(RightMotors.position(deg)) + abs(LeftMotors.position(deg))) / 2;
-    error = distanceToDrive - (currentDegree / DEGREE_PER_CM);
+    error = degreeToDrive - currentDegree;
     integral = integral + error;
-    if(error >= 20){  // ~15cm
+    if(error >= 70){  // ~15cm
       integral = 0;
     }
     speed = error * Kp + Ki * integral;
@@ -247,8 +247,11 @@ void drive_backward(int distanceToDrive, int VelocityMax){
 }
 
 void outake(void){
-  LIntake.spinFor(reverse, 1, vex::timeUnits::sec, 100, vex::velocityUnits::pct);
-  RIntake.spinFor(forward, 1, vex::timeUnits::sec, 100, vex::velocityUnits::pct);
+  LIntake.setVelocity(100, pct);
+  RIntake.setVelocity(100, pct);
+  LIntake.spin(reverse);
+  RIntake.spin(forward);
+  wait(1, sec);
   LIntake.stop();
   RIntake.stop();
 }
@@ -316,13 +319,16 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-   drive_forward(120, 80);
+   drive_backward(110, 100);
    wait(20, msec);
-   turn_left(90, 70);
+   turn_right(90, 70);
    wait(20, msec);
-   drive_forward(20, 40);
+   drive_forward(15, 100);
    outake();
-   drive_backward(20, 40);
+   wait(200,msec);
+   drive_forward(5,100);
+   wait(20, msec);
+   drive_backward(25, 100);
    turn_left(70, 70);
   }
 
