@@ -258,16 +258,18 @@ void outake(void){
 }
 
 void Arm_Move(void){
-  Arm.setVelocity(20, pct);
+  Arm.setVelocity(30, pct);
+  //Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
   Arm.spinTo(170, deg, true);
   Arm.stop();
 }
 
 void Arm_Move_back(void){
-  Arm.setVelocity(100, pct);
+  Arm.setVelocity(30, pct);
+  //Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
-  Arm.spinTo(-100, deg, true);
+  Arm.spinTo(10, deg, true);
   Arm.stop();
 }
 
@@ -311,7 +313,9 @@ int ShowMeInfo(){
     Brain.Screen.setCursor(9,1);
     Brain.Screen.print(LeftMotors.position(rotationUnits::deg)); 
     Brain.Screen.setCursor(10,1);
-    Brain.Screen.print(RightMotors.position(rotationUnits::deg)); 
+    Brain.Screen.print(RightMotors.position(rotationUnits::deg));
+    Brain.Screen.setCursor(11,1);
+    Brain.Screen.print(Arm.position(rotationUnits::deg));
 
     wait(25, msec);
   } 
@@ -334,10 +338,10 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  Arm_Move();
-  turn_right(45,30);
-  Arm_Move_back();
-  /*
+  //Arm_Move();
+  //turn_right(80,30);
+  //Arm_Move_back();
+  
    drive_backward(110, 100);
    wait(20, msec);
    turn_right(90, 70);
@@ -348,8 +352,7 @@ void autonomous(void) {
    drive_forward(5,100);
    wait(20, msec);
    drive_backward(25, 100);
-   turn_left(70, 70);\
-   */
+   turn_left(70, 70);
   }
 
 
