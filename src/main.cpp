@@ -266,8 +266,8 @@ void Arm_Move(void){
 }
 
 void Arm_Move_back(void){
-  Arm.setVelocity(30, pct);
-  //Arm.setMaxTorque(100, pct);
+  Arm.setVelocity(60, pct);
+  Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
   Arm.spinTo(10, deg, true);
   Arm.stop();
