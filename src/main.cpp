@@ -28,6 +28,7 @@ motor LeftWing = motor(PORT6, ratio18_1, false);
 motor RightWing = motor(PORT7, ratio18_1, false);
 motor LIntake = motor(PORT1, ratio18_1, false);
 motor RIntake = motor(PORT2, ratio18_1, false);
+motor Arm = motor(PORT8, ratio18_1, false);
 inertial DaInertial = inertial(PORT10);
 motor_group LeftMotors = motor_group(MotorLF, MotorLB);
 motor_group RightMotors = motor_group(MotorRF, MotorRB);
@@ -256,6 +257,20 @@ void outake(void){
   RIntake.stop();
 }
 
+void Arm_Move(void){
+  Arm.setVelocity(20, pct);
+  Arm.setBrake(coast);
+  Arm.spinTo(170, deg, true);
+  Arm.stop();
+}
+
+void Arm_Move_back(void){
+  Arm.setVelocity(100, pct);
+  Arm.setBrake(coast);
+  Arm.spinTo(-100, deg, true);
+  Arm.stop();
+}
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -319,6 +334,10 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
+  Arm_Move();
+  turn_right(45,30);
+  Arm_Move_back();
+  /*
    drive_backward(110, 100);
    wait(20, msec);
    turn_right(90, 70);
@@ -329,7 +348,8 @@ void autonomous(void) {
    drive_forward(5,100);
    wait(20, msec);
    drive_backward(25, 100);
-   turn_left(70, 70);
+   turn_left(70, 70);\
+   */
   }
 
 
