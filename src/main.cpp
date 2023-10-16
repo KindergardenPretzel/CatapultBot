@@ -51,6 +51,36 @@ float const GEAR_RATIO = 1.67;
 float const DEGREE_PER_CM = 360 / (WHEEL_CIRC * GEAR_RATIO);
 
 
+// ##### TEST
+
+void drive_test(int degreeToDrive){
+  float Kp = 1;
+  float Ki = 0.0; // was 0.2
+  float integral = 0;
+  float error;
+  float currentDegree;
+  float speed;
+  RightMotors.resetPosition();
+  LeftMotors.resetPosition();
+  do {
+    wait(20,msec);
+    currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
+    error = degreeToDrive - currentDegree;
+    integral = integral + error;
+    if(error >= 100){  // ~15cm
+      integral = 0;
+    }
+    speed = error * Kp + Ki * integral;
+ 
+    RightMotors.spin(forward, 25, pct);
+    LeftMotors.spin(forward, 25, pct);
+  } while(currentDegree < degreeToDrive);
+  RightMotors.stop(brake);
+  LeftMotors.stop(brake);
+}
+
+// ##### TEST
+
 void event_Catapult(void){
       if (!ShootButtonPressed) {
         Shooter.setVelocity(80.0, percent);
@@ -105,39 +135,13 @@ void event_Outake(void){
 }
 
 
-void go_forward(void){
-  LeftMotors.spin(forward);
-  RightMotors.spin(forward); 
-}
-
-void go_backward(void){
-  LeftMotors.spin(reverse);
-  RightMotors.spin(reverse); 
-}
-
-void go_left(void){
-  LeftMotors.spin(reverse);
-  RightMotors.spin(forward); 
-}
-
-void go_right(void){
-  LeftMotors.spin(forward);
-  RightMotors.spin(reverse); 
-}
-
-void stop(void){
-  LeftMotors.stop();
-  RightMotors.stop(); 
-}
-
-
 void turn_right(int DegreesToTurn, int VelocityMax) {
   // P control: error = degreeToTurn - current location
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.4;
-  float Ki = 0.02; // was 0.0015
+  float Kp = 0.6;
+  float Ki = 0.0015; // was 0.0015
   float error;
   float speed;
   float integral = 0;
@@ -155,7 +159,7 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
     }
     RightMotors.spin(reverse, speed, pct);
     LeftMotors.spin(forward, speed, pct);
-  } while(DaInertial.rotation() > DegreesToTurn + 0.3 or DaInertial.rotation() < DegreesToTurn - 0.3);
+  } while(DaInertial.rotation() > DegreesToTurn + 1 or DaInertial.rotation() < DegreesToTurn - 1);
   RightMotors.stop();
   LeftMotors.stop(brake);
 }
@@ -165,8 +169,8 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.4;
-  float Ki = 0.02; // .0015
+  float Kp = 0.6;
+  float Ki = 0.0015; // .0015
   float error;
   float speed;
   float integral = 0;
@@ -184,14 +188,14 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
     }
     RightMotors.spin(forward, speed, pct);
     LeftMotors.spin(reverse, speed, pct);
-  } while(fabs(DaInertial.rotation()) > DegreesToTurn + 0.5 or fabs(DaInertial.rotation()) < DegreesToTurn - 0.5);
+  } while(fabs(DaInertial.rotation()) > DegreesToTurn + 1 or fabs(DaInertial.rotation()) < DegreesToTurn - 1);
   RightMotors.stop(brake);
   LeftMotors.stop(brake);
 }
 
 void drive_forward(int distanceToDrive, int VelocityMax){
-  float Kp = 0.2;
-  float Ki = 0.03; // was 0.2
+  float Kp = 0.6;
+  float Ki = 0.0; 
   float integral = 0;
   float error;
   float currentDegree;
@@ -219,8 +223,8 @@ void drive_forward(int distanceToDrive, int VelocityMax){
 }
 
 void drive_backward(int distanceToDrive, int VelocityMax){
-  float Kp = 0.2;
-  float Ki = 0.02; // was 0.2
+  float Kp = 0.6;
+  float Ki = 0; // was 0.2
   float integral = 0;
   float error;
   float currentDegree;
@@ -268,7 +272,7 @@ void Arm_Move(void){
 }
 
 void Arm_Move_back(void){
-  Arm.setVelocity(70, pct);
+  Arm.setVelocity(40, pct);
   Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
   Arm.spinTo(20, deg, true);
@@ -340,26 +344,29 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-
-   drive_backward(130, 100);
+  
+   drive_backward(120, 100);
    wait(20, msec);
    turn_right(90, 70);
    wait(20, msec);
    drive_forward(8, 100);
    outake_on();
+   wait(20, msec);
    drive_forward(3,100);
    wait(20, msec);
-   drive_backward(20, 100);
+   drive_backward(45, 100);
    outake_off();
-   turn_right(90, 70);
-   drive_backward(75,50);
-   turn_right(45,60);
-   drive_backward(60,50);
+   wait(20, msec);
+   turn_right(130, 70);
+   wait(20, msec);
+   drive_backward(140,50);
+   wait(20, msec);
    Arm_Move();
+   wait(20, msec);
    turn_right(80,60);
+   wait(20, msec);
    Arm_Move_back();
 
- 
   }
 
 
@@ -386,7 +393,8 @@ void usercontrol(void) {
   while (1) {
     RightMotors.setVelocity((Controller1.Axis3.position() - Controller1.Axis1.position()), percent);
     LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
-    go_forward();
+    RightMotors.spin(forward);
+    LeftMotors.spin(forward);
     
 
     wait(20, msec); // Sleep the task for a short amount of time to
