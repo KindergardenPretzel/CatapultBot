@@ -343,30 +343,37 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+  int speedLimit = 65;
+  int TurnSpeedLimit = 70;
   vex::task MyTask(ShowMeInfo);
   
-   drive_backward(120, 100);
+   drive_backward(120, speedLimit);
    wait(20, msec);
-   turn_right(90, 70);
+   turn_right(90, TurnSpeedLimit);
    wait(20, msec);
-   drive_forward(8, 100);
+   drive_forward(3, speedLimit);
    outake_on();
    wait(20, msec);
-   drive_forward(3,100);
+   drive_forward(10,speedLimit);
    wait(20, msec);
-   drive_backward(45, 100);
+   drive_backward(45, speedLimit);
    outake_off();
    wait(20, msec);
-   turn_right(130, 70);
+   turn_right(135, TurnSpeedLimit);
    wait(20, msec);
-   drive_backward(140,50);
+   drive_backward(130,speedLimit);
    wait(20, msec);
    Arm_Move();
    wait(20, msec);
-   turn_right(80,60);
-   wait(20, msec);
+   turn_right(80,TurnSpeedLimit);
+   wait(20, msec); 
    Arm_Move_back();
-
+   wait(20, msec);
+   drive_forward(30, 40);
+   wait(20, msec);
+   turn_left(45, TurnSpeedLimit);
+   wait(20, msec);
+   drive_forward(100,speedLimit);
   }
 
 
