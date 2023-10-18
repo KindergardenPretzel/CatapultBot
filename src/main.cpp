@@ -140,7 +140,7 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.6;
+  float Kp = 0.5;
   float Ki = 0.0015; // was 0.0015
   float error;
   float speed;
@@ -169,7 +169,7 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.6;
+  float Kp = 0.5;
   float Ki = 0.0015; // .0015
   float error;
   float speed;
@@ -369,11 +369,11 @@ void autonomous(void) {
    wait(20, msec); 
    Arm_Move_back();
    wait(20, msec);
-   drive_forward(30, 40);
+   drive_forward(40, 40);
    wait(20, msec);
    turn_left(45, TurnSpeedLimit);
    wait(20, msec);
-   drive_forward(100,speedLimit);
+   drive_forward(105,speedLimit);
   }
 
 
