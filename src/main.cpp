@@ -280,8 +280,9 @@ void outake_on(void){
 }
 
 void Arm_Move(void){
-  Arm.setVelocity(30, pct);
-  //Arm.setMaxTorque(100, pct);
+  Arm.resetPosition();
+  Arm.setVelocity(40, pct);
+  Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
   Arm.spinTo(175, deg, true);
   Arm.stop();
@@ -362,7 +363,7 @@ void autonomous(void) {
   int speedLimit = 8;
   int TurnSpeedLimit = 7;
   vex::task MyTask(ShowMeInfo);
-  // drive back
+  
    drive_backward(120, speedLimit);
    wait(20, msec);
    turn_right(90, TurnSpeedLimit);
