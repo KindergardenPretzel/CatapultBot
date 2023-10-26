@@ -360,8 +360,8 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  int speedLimit = 8;
-  int TurnSpeedLimit = 7;
+  int speedLimit = 12;
+  int TurnSpeedLimit = 12;
   vex::task MyTask(ShowMeInfo);
   
    drive_backward(120, speedLimit);
