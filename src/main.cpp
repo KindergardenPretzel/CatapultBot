@@ -95,7 +95,7 @@ void event_Catapult(void){
 };
 
 void event_Wings(void){
-    if (!WingButtonPressed) {
+    if (!WingButtonPressed && !ArmButtonPressed) {
     	RightWing.setVelocity(70.0, percent);
       LeftWing.setVelocity(60.0, percent);
       RightWing.spinFor(reverse, 175.0, degrees, true);
@@ -104,7 +104,7 @@ void event_Wings(void){
       RightWing.stop();
       WingButtonPressed = true;
     }
-    else {
+    else if(WingButtonPressed && !ArmButtonPressed){
       RightWing.setVelocity(70.0, percent);
       LeftWing.setVelocity(70.0, percent);
       LeftWing.spinFor(reverse, 175.0, degrees, true);
@@ -156,8 +156,8 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.13;
-  float Ki = 0.007; // was 0.0015
+  float Kp = 0.1;
+  float Ki = 0.006; // was 0.0015
   float error;
   float speed;
   float integral = 0;
@@ -166,7 +166,7 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
     wait(20, msec);
     error = DegreesToTurn - DaInertial.rotation();
     integral = integral + error;
-    if(error >= 20){ // was 20
+    if(error >= 15){ 
       integral = 0;
     }
     speed = Kp * error + Ki * integral;
@@ -175,9 +175,9 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
     }
     RightMotors.spin(reverse, speed, volt);
     LeftMotors.spin(forward, speed, volt);
-  } while(DaInertial.rotation() > DegreesToTurn + 0.5 or DaInertial.rotation() < DegreesToTurn - 0.5);
-  RightMotors.stop(brake);
-  LeftMotors.stop(brake);
+  } while(DaInertial.rotation() > DegreesToTurn + 1 or DaInertial.rotation() < DegreesToTurn - 1);
+  RightMotors.stop(hold);
+  LeftMotors.stop(hold);
 }
 
 void turn_left(int DegreesToTurn, int VelocityMax) {
@@ -185,8 +185,8 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.13;
-  float Ki = 0.007; // .0015
+  float Kp = 0.1;
+  float Ki = 0.006; // was 0.0015
   float error;
   float speed;
   float integral = 0;
@@ -364,6 +364,16 @@ void autonomous(void) {
   int TurnSpeedLimit = 12;
   vex::task MyTask(ShowMeInfo);
   
+   /*
+   turn_right(90, TurnSpeedLimit);
+   wait(20, msec);
+   turn_right(90, TurnSpeedLimit);
+   wait(20, msec);
+   turn_right(90, TurnSpeedLimit);
+   wait(20, msec);
+   exit(0);
+   */
+
    drive_backward(120, speedLimit);
    wait(20, msec);
    turn_right(90, TurnSpeedLimit);
@@ -379,7 +389,7 @@ void autonomous(void) {
    wait(20, msec);
    turn_right(135, TurnSpeedLimit);
    wait(100, msec);
-   drive_backward(140,speedLimit);
+   drive_backward(145,speedLimit);
    wait(20, msec);
    Arm_Move();
    wait(800, msec);   
