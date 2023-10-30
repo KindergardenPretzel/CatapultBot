@@ -52,52 +52,19 @@ float const GEAR_RATIO = 1.67;
 float const DEGREE_PER_CM = 360 / (WHEEL_CIRC * GEAR_RATIO);
 
 
-// ##### TEST
-
-void drive_test(int degreeToDrive){
-  float Kp = 1;
-  float Ki = 0.0; // was 0.2
-  float integral = 0;
-  float error;
-  float currentDegree;
-  float speed;
-  RightMotors.resetPosition();
-  LeftMotors.resetPosition();
-  do {
-    wait(20,msec);
-    currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
-    error = degreeToDrive - currentDegree;
-    integral = integral + error;
-    if(error >= 100){  // ~15cm
-      integral = 0;
-    }
-    speed = error * Kp + Ki * integral;
- 
-    RightMotors.spin(forward, 25, pct);
-    LeftMotors.spin(forward, 25, pct);
-  } while(currentDegree < degreeToDrive);
-  RightMotors.stop(brake);
-  LeftMotors.stop(brake);
+void push(){
+ LeftMotors.setVelocity(100,pct);
+ RightMotors.setVelocity(100,pct);
+ LeftMotors.spinFor(1,sec);
+ RightMotors.spinFor(1,sec);
 }
 
-// ##### TEST
 
-void event_Catapult(void){
-      if (!ShootButtonPressed) {
-        Shooter.setVelocity(80.0, percent);
-        Shooter.spin(reverse);
-        ShootButtonPressed = true;
-      }
-      else {
-        Shooter.stop();
-        ShootButtonPressed = false;
-      };
-};
 
 void event_Wings(void){
     if (!WingButtonPressed && !ArmButtonPressed) {
     	RightWing.setVelocity(70.0, percent);
-      LeftWing.setVelocity(60.0, percent);
+      LeftWing.setVelocity(60.0, percent); 
       RightWing.spinFor(reverse, 175.0, degrees, true);
       LeftWing.spinFor(forward, 175.0, degrees, true);
       LeftWing.stop();
@@ -114,6 +81,18 @@ void event_Wings(void){
       WingButtonPressed = false;
     }
 }
+
+void event_Catapult(void){
+      if (!ShootButtonPressed) {
+        Shooter.setVelocity(80.0, percent);
+        Shooter.spin(reverse);
+        ShootButtonPressed = true;
+      }
+      else {
+        Shooter.stop();
+        ShootButtonPressed = false;
+      };
+};
 
 void event_Intake(void){
   LIntake.setVelocity(100.0, percent);
@@ -156,7 +135,7 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.1;
+  float Kp = 0.2;
   float Ki = 0.006; // was 0.0015
   float error;
   float speed;
@@ -166,7 +145,7 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
     wait(20, msec);
     error = DegreesToTurn - DaInertial.rotation();
     integral = integral + error;
-    if(error >= 15){ 
+    if(error >= 20){ 
       integral = 0;
     }
     speed = Kp * error + Ki * integral;
@@ -186,7 +165,7 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
   float Kp = 0.1;
-  float Ki = 0.006; // was 0.0015
+  float Ki = 0.003; // was 0.0015
   float error;
   float speed;
   float integral = 0;
@@ -318,6 +297,9 @@ void pre_auton(void) {
     wait(20, msec);
   };
   Brain.Screen.clearScreen();
+  LeftWing.resetPosition();
+  RightWing.resetPosition();
+  Arm.resetPosition();
 
 }
 
@@ -360,10 +342,12 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  int speedLimit = 12;
+  int speedLimit = 8;
   int TurnSpeedLimit = 12;
   vex::task MyTask(ShowMeInfo);
   
+  push();
+  exit(0);
    /*
    turn_right(90, TurnSpeedLimit);
    wait(20, msec);
@@ -379,9 +363,8 @@ void autonomous(void) {
    turn_right(90, TurnSpeedLimit);
    wait(20, msec);
    // score
+   push();
    outake_on();
-   wait(20, msec);
-   drive_forward(10,speedLimit);
    wait(20, msec);
    // go back
    drive_backward(57, speedLimit);
