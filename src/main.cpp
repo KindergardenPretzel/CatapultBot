@@ -360,7 +360,7 @@ void auto_own(void){
   wait(20,msec);
   turn_left(90, TurnSpeedLimit);
   wait(20,msec);
-  drive_backward(50,speedLimit);
+  drive_backward(52,speedLimit);
   wait(20,msec);
   Arm_Move();
 }
