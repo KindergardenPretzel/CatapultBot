@@ -267,7 +267,7 @@ void outake_on(void){
 
 void Arm_Move(void){
   Arm.resetPosition();
-  Arm.setVelocity(70, pct);
+  Arm.setVelocity(80, pct);
   Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
   Arm.spinTo(175, deg, true);
@@ -275,7 +275,7 @@ void Arm_Move(void){
 }
 
 void Arm_Move_back(void){
-  Arm.setVelocity(70, pct);
+  Arm.setVelocity(80, pct);
   Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
   Arm.spinTo(20, deg, true);
@@ -346,17 +346,16 @@ void auto_own(void){
   push();
   outake_off();
   wait(20,msec);
-  drive_backward(57, speedLimit);
+  drive_backward(63, speedLimit);
   wait(20,msec);
   turn_right(135, TurnSpeedLimit);
   wait(20,msec);
   drive_backward(140,speedLimit);
   wait(20,msec);
   Arm_Move();
-  wait(270,msec);
-  drive_forward(42, speedLimit);
+  wait(300,msec);
+  drive_forward(105, speedLimit);
   Arm_Move_back();
-  drive_forward(65,speedLimit);
   wait(20,msec);
   turn_left(90, TurnSpeedLimit);
   wait(20,msec);
