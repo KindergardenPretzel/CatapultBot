@@ -55,8 +55,13 @@ float const DEGREE_PER_CM = 360 / (WHEEL_CIRC * GEAR_RATIO);
 void push(){
  LeftMotors.setVelocity(100,pct);
  RightMotors.setVelocity(100,pct);
- LeftMotors.spinFor(1,sec);
- RightMotors.spinFor(1,sec);
+ LeftMotors.spin(forward);
+ RightMotors.spin(forward);
+ wait(250,msec);
+ LeftMotors.stop();
+ RightMotors.stop();
+ //LeftMotors.spinFor(500,msec);
+ //RightMotors.spinFor(500,msec);
 }
 
 
@@ -135,8 +140,8 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.2;
-  float Ki = 0.006; // was 0.0015
+  float Kp = 0.13;
+  float Ki = 0.001; // was 0.0015
   float error;
   float speed;
   float integral = 0;
@@ -145,7 +150,7 @@ void turn_right(int DegreesToTurn, int VelocityMax) {
     wait(20, msec);
     error = DegreesToTurn - DaInertial.rotation();
     integral = integral + error;
-    if(error >= 20){ 
+    if(error >= 5){ 
       integral = 0;
     }
     speed = Kp * error + Ki * integral;
@@ -164,8 +169,8 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   // Speeed = Kp * error
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
-  float Kp = 0.1;
-  float Ki = 0.003; // was 0.0015
+  float Kp = 0.13;
+  float Ki = 0.001; // was 0.0015
   float error;
   float speed;
   float integral = 0;
@@ -174,7 +179,7 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
     wait(20, msec);
     error = DegreesToTurn - fabs(DaInertial.rotation());
     integral = integral + error;
-    if(error >= 20){ // was 20
+    if(error >= 5){ // was 20
       integral = 0;
     }
     speed = Kp * error + Ki * integral;
@@ -239,11 +244,13 @@ void drive_backward(int distanceToDrive, int VelocityMax){
     if (speed > VelocityMax) {
       speed = VelocityMax;
     }
-    RightMotors.spin(reverse, speed, volt);
     LeftMotors.spin(reverse, speed, volt);
+    RightMotors.spin(reverse, speed, volt);
+
   } while(currentDegree < degreeToDrive);
-  RightMotors.stop(brake);
-  LeftMotors.stop(brake);
+
+  LeftMotors.stop(hold);
+  RightMotors.stop(hold);
 }
 
 void outake_off(void){
@@ -260,7 +267,7 @@ void outake_on(void){
 
 void Arm_Move(void){
   Arm.resetPosition();
-  Arm.setVelocity(40, pct);
+  Arm.setVelocity(70, pct);
   Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
   Arm.spinTo(175, deg, true);
@@ -268,7 +275,7 @@ void Arm_Move(void){
 }
 
 void Arm_Move_back(void){
-  Arm.setVelocity(40, pct);
+  Arm.setVelocity(70, pct);
   Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
   Arm.spinTo(20, deg, true);
@@ -327,6 +334,37 @@ int ShowMeInfo(){
   return 0;
 }
 
+void auto_own(void){
+  int speedLimit = 6;
+  int TurnSpeedLimit = 6;
+  drive_backward(120, speedLimit);
+  wait(20, msec);
+  turn_right(90, TurnSpeedLimit);
+  wait(20, msec);
+  outake_on();
+  wait(20,msec);
+  push();
+  outake_off();
+  wait(20,msec);
+  drive_backward(57, speedLimit);
+  wait(20,msec);
+  turn_right(135, TurnSpeedLimit);
+  wait(20,msec);
+  drive_backward(140,speedLimit);
+  wait(20,msec);
+  Arm_Move();
+  wait(270,msec);
+  drive_forward(42, speedLimit);
+  Arm_Move_back();
+  drive_forward(65,speedLimit);
+  wait(20,msec);
+  turn_left(90, TurnSpeedLimit);
+  wait(20,msec);
+  drive_backward(50,speedLimit);
+  wait(20,msec);
+  Arm_Move();
+}
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -337,56 +375,15 @@ int ShowMeInfo(){
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-
 void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  int speedLimit = 8;
-  int TurnSpeedLimit = 12;
+  
   vex::task MyTask(ShowMeInfo);
   
-  push();
-  exit(0);
-   /*
-   turn_right(90, TurnSpeedLimit);
-   wait(20, msec);
-   turn_right(90, TurnSpeedLimit);
-   wait(20, msec);
-   turn_right(90, TurnSpeedLimit);
-   wait(20, msec);
-   exit(0);
-   */
+  auto_own();
 
-   drive_backward(120, speedLimit);
-   wait(20, msec);
-   turn_right(90, TurnSpeedLimit);
-   wait(20, msec);
-   // score
-   push();
-   outake_on();
-   wait(20, msec);
-   // go back
-   drive_backward(57, speedLimit);
-   outake_off();
-   wait(20, msec);
-   turn_right(135, TurnSpeedLimit);
-   wait(100, msec);
-   drive_backward(145,speedLimit);
-   wait(20, msec);
-   Arm_Move();
-   wait(800, msec);   
-   drive_forward(20,speedLimit);
-   wait(40, msec); 
-   Arm_Move_back();
-   wait(20, msec);
-   turn_right(90, TurnSpeedLimit);
-   wait(20, msec);
-   drive_forward(42, speedLimit);
-   wait(20, msec);
-   turn_left(40, TurnSpeedLimit);
-   wait(20, msec);
-   drive_forward(95, speedLimit);
   }
 
 
