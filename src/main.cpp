@@ -389,18 +389,18 @@ void auto_own(void){
   wait(20,msec);
   turn_right(135, TurnSpeedLimit);
   wait(20,msec);
-  drive_backward(142,speedLimit);
+  drive_backward(145,speedLimit);
   wait(20,msec);
   Arm_Move();
   wait(300,msec);
-  drive_forward(105, speedLimit);
+  drive_forward(108, speedLimit);
   //Arm_Move_back();
-  Arm.spinToPosition(150, deg, false);
+  Arm.spinToPosition(130, deg, false);
   wait(20,msec);
   turn_left(90, TurnSpeedLimit);
   wait(20,msec);
   //Arm.spinToPosition(150, deg, false);
-  drive_backward(43,speedLimit);
+  drive_backward(50,speedLimit);
   //wait(20,msec);
   //Arm_Move();
 }
@@ -421,8 +421,8 @@ void auto_opposite(){
   wait(20,msec);
   turn_left(45, TurnSpeedLimit);
   wait(20,msec);
-  Arm.spinTo(150, deg, false);
-  drive_backward(78,speedLimit);
+  Arm.spinTo(130, deg, false);
+  drive_backward(89,speedLimit);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -442,8 +442,8 @@ void autonomous(void) {
   
   vex::task MyTask(ShowMeInfo);
   
-  auto_opposite();
-   //auto_own();
+  //auto_opposite();
+  auto_own();
   }
 
 
