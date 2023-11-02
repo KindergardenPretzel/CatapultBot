@@ -440,10 +440,10 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   
-  vex::task MyTask(ShowMeInfo);
+  //vex::task MyTask(ShowMeInfo);
   
-  //auto_opposite();
-  auto_own();
+  auto_opposite();
+  //auto_own();
   }
 
 
