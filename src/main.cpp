@@ -161,7 +161,7 @@ void event_Arm(void){
     if (!isArmOpen()) {
       Arm.setStopping(coast);
     	Arm.setVelocity(70.0, percent);
-      Arm.spinToPosition(170,deg, true);
+      Arm.spinTo(170,deg, true);
       Arm.stop();
       //Arm.spinFor(forward, 150.0, degrees, true);
       //Arm.stop();
@@ -170,7 +170,7 @@ void event_Arm(void){
     else {
       Arm.setVelocity(70.0, percent);
       Arm.setStopping(coast);
-      Arm.spinToPosition(30,deg,true);
+      Arm.spinTo(30,deg,true);
       Arm.stop();
       //Arm.spinFor(reverse, 175.0, degrees, true);
       //Arm.stop();
@@ -421,8 +421,8 @@ void auto_opposite(){
   wait(20,msec);
   turn_left(45, TurnSpeedLimit);
   wait(20,msec);
-  Arm.spinToPosition(150, deg, false);
-  drive_backward(77,speedLimit);
+  Arm.spinTo(150, deg, false);
+  drive_backward(78,speedLimit);
 }
 
 /*---------------------------------------------------------------------------*/
