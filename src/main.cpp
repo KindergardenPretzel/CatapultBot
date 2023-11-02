@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       OLEG DA GREAT                                             */
+/*    Author:       OLEG DA bad                                             */
 /*    Created:      9/19/2023, 6:22:50 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
@@ -28,7 +28,7 @@ motor LeftWing = motor(PORT6, ratio18_1, false);
 motor RightWing = motor(PORT7, ratio18_1, false);
 motor LIntake = motor(PORT1, ratio18_1, false);
 motor RIntake = motor(PORT2, ratio18_1, false);
-motor Arm = motor(PORT8, ratio18_1, false);
+motor Arm = motor(PORT8, ratio36_1, false);
 inertial DaInertial = inertial(PORT10);
 motor_group LeftMotors = motor_group(MotorLF, MotorLB);
 motor_group RightMotors = motor_group(MotorRF, MotorRB);
@@ -51,13 +51,37 @@ float const WHEEL_CIRC = WHEEL_DIAMETER * 3.14;
 float const GEAR_RATIO = 1.67;
 float const DEGREE_PER_CM = 360 / (WHEEL_CIRC * GEAR_RATIO);
 
+bool isArmOpen(){
+  int encoderValue = Arm.position(deg);
+  if(encoderValue > 40){
+    return true;
+  }
+  return false;
+}
+
+bool isRightWOpen(){
+  int encoderValue = RightWing.position(deg);
+  if(encoderValue < -40){
+    return true;
+  }
+  return false;
+}
+
+bool isLeftWOpen(){
+  int encoderValue = LeftWing.position(deg);
+  if(encoderValue > 40){
+    return true;
+  }
+  return false;
+}
+
 
 void push(){
  LeftMotors.setVelocity(100,pct);
  RightMotors.setVelocity(100,pct);
  LeftMotors.spin(forward);
  RightMotors.spin(forward);
- wait(250,msec);
+ wait(300,msec);
  LeftMotors.stop();
  RightMotors.stop();
  //LeftMotors.spinFor(500,msec);
@@ -67,23 +91,35 @@ void push(){
 
 
 void event_Wings(void){
-    if (!WingButtonPressed && !ArmButtonPressed) {
-    	RightWing.setVelocity(70.0, percent);
-      LeftWing.setVelocity(60.0, percent); 
-      RightWing.spinFor(reverse, 175.0, degrees, true);
-      LeftWing.spinFor(forward, 175.0, degrees, true);
-      LeftWing.stop();
-      RightWing.stop();
+    if (!isArmOpen() && !WingButtonPressed) 
+ {
+      if(!isRightWOpen())
+      {
+        RightWing.setVelocity(70.0, percent);
+        RightWing.spinFor(reverse, 175.0, degrees, true);
+        RightWing.stop();
+      }
+      if(!isLeftWOpen()){
+        LeftWing.setVelocity(60.0, percent);      
+        LeftWing.spinFor(forward, 175.0, degrees, true);
+        LeftWing.stop(); 
+      }
       WingButtonPressed = true;
     }
-    else if(WingButtonPressed && !ArmButtonPressed){
-      RightWing.setVelocity(70.0, percent);
-      LeftWing.setVelocity(70.0, percent);
+    
+    else if (!isArmOpen() && WingButtonPressed) {
+    if(isLeftWOpen()){
+      LeftWing.setVelocity(60.0, percent);      
       LeftWing.spinFor(reverse, 175.0, degrees, true);
+      LeftWing.stop(); 
+    }
+    if(isRightWOpen())
+    {
+      RightWing.setVelocity(70.0, percent);
       RightWing.spinFor(forward, 175.0, degrees, true);
-      LeftWing.stop();
       RightWing.stop();
-      WingButtonPressed = false;
+    }
+    WingButtonPressed = false;
     }
 }
 
@@ -119,18 +155,26 @@ void event_Outake(void){
   RIntake.stop();
 }
 
+
+
 void event_Arm(void){
-    if (!ArmButtonPressed) {
+    if (!isArmOpen()) {
+      Arm.setStopping(coast);
     	Arm.setVelocity(70.0, percent);
-      Arm.spinFor(forward, 175.0, degrees, true);
+      Arm.spinToPosition(170,deg, true);
       Arm.stop();
-      ArmButtonPressed = true;
+      //Arm.spinFor(forward, 150.0, degrees, true);
+      //Arm.stop();
+      //ArmButtonPressed = true;
     }
     else {
       Arm.setVelocity(70.0, percent);
-      Arm.spinFor(reverse, 175.0, degrees, true);
+      Arm.setStopping(coast);
+      Arm.spinToPosition(30,deg,true);
       Arm.stop();
-      ArmButtonPressed = false;
+      //Arm.spinFor(reverse, 175.0, degrees, true);
+      //Arm.stop();
+      //ArmButtonPressed = false;
     }
 }
 
@@ -170,7 +214,7 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
   float Kp = 0.13;
-  float Ki = 0.001; // was 0.0015
+  float Ki = 0.009; // was 0.0015
   float error;
   float speed;
   float integral = 0;
@@ -179,7 +223,7 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
     wait(20, msec);
     error = DegreesToTurn - fabs(DaInertial.rotation());
     integral = integral + error;
-    if(error >= 5){ // was 20
+    if(error >= 10){ 
       integral = 0;
     }
     speed = Kp * error + Ki * integral;
@@ -189,8 +233,8 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
     RightMotors.spin(forward, speed, volt);
     LeftMotors.spin(reverse, speed, volt);
   } while(fabs(DaInertial.rotation()) > DegreesToTurn + 1 or fabs(DaInertial.rotation()) < DegreesToTurn - 1);
-  RightMotors.stop(brake);
-  LeftMotors.stop(brake);
+  RightMotors.stop(hold);
+  LeftMotors.stop(hold);
 }
 
 void drive_forward(int distanceToDrive, int VelocityMax){
@@ -266,11 +310,10 @@ void outake_on(void){
 }
 
 void Arm_Move(void){
-  Arm.resetPosition();
   Arm.setVelocity(80, pct);
   Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
-  Arm.spinTo(175, deg, true);
+  Arm.spinToPosition(175, deg, true);
   Arm.stop();
 }
 
@@ -278,7 +321,7 @@ void Arm_Move_back(void){
   Arm.setVelocity(80, pct);
   Arm.setMaxTorque(100, pct);
   Arm.setBrake(coast);
-  Arm.spinTo(20, deg, true);
+  Arm.spinToPosition(20, deg, true);
   Arm.stop();
 }
 
@@ -304,10 +347,6 @@ void pre_auton(void) {
     wait(20, msec);
   };
   Brain.Screen.clearScreen();
-  LeftWing.resetPosition();
-  RightWing.resetPosition();
-  Arm.resetPosition();
-
 }
 
 int ShowMeInfo(){
@@ -335,7 +374,7 @@ int ShowMeInfo(){
 }
 
 void auto_own(void){
-  int speedLimit = 6;
+  int speedLimit = 7;
   int TurnSpeedLimit = 6;
   drive_backward(120, speedLimit);
   wait(20, msec);
@@ -346,22 +385,44 @@ void auto_own(void){
   push();
   outake_off();
   wait(20,msec);
-  drive_backward(63, speedLimit);
+  drive_backward(67, speedLimit);
   wait(20,msec);
   turn_right(135, TurnSpeedLimit);
   wait(20,msec);
-  drive_backward(140,speedLimit);
+  drive_backward(142,speedLimit);
   wait(20,msec);
   Arm_Move();
   wait(300,msec);
   drive_forward(105, speedLimit);
-  Arm_Move_back();
+  //Arm_Move_back();
+  Arm.spinToPosition(150, deg, false);
   wait(20,msec);
   turn_left(90, TurnSpeedLimit);
   wait(20,msec);
-  drive_backward(52,speedLimit);
+  //Arm.spinToPosition(150, deg, false);
+  drive_backward(43,speedLimit);
+  //wait(20,msec);
+  //Arm_Move();
+}
+
+void auto_opposite(){
+  int speedLimit = 6;
+  int TurnSpeedLimit = 7;
+  drive_backward(120, speedLimit);
+  wait(20, msec);
+  turn_left(90, TurnSpeedLimit);
+  wait(20, msec);
+  outake_on();
+  wait(40,msec);
+  push();  
+  wait(40,msec); 
+  drive_backward(10, speedLimit);
+  outake_off();
   wait(20,msec);
-  Arm_Move();
+  turn_left(45, TurnSpeedLimit);
+  wait(20,msec);
+  Arm.spinToPosition(150, deg, false);
+  drive_backward(77,speedLimit);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -381,8 +442,8 @@ void autonomous(void) {
   
   vex::task MyTask(ShowMeInfo);
   
-  auto_own();
-
+  auto_opposite();
+   //auto_own();
   }
 
 
@@ -423,6 +484,9 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+  LeftWing.resetPosition();
+  RightWing.resetPosition();
+  Arm.resetPosition();
   // Run the pre-autonomous function.
   pre_auton();
   // Set up callbacks for autonomous and driver control periods.
