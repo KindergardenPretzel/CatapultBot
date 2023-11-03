@@ -33,15 +33,9 @@ inertial DaInertial = inertial(PORT10);
 motor_group LeftMotors = motor_group(MotorLF, MotorLB);
 motor_group RightMotors = motor_group(MotorRF, MotorRB);
 
-
-
-
-
 // Variables
-
 bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
-bool ArmButtonPressed = false;
   // 1 revolution = ~26cm
   // 60/36 Gear Ratio
   // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
@@ -163,18 +157,12 @@ void event_Arm(void){
     	Arm.setVelocity(70.0, percent);
       Arm.spinTo(170,deg, true);
       Arm.stop();
-      //Arm.spinFor(forward, 150.0, degrees, true);
-      //Arm.stop();
-      //ArmButtonPressed = true;
     }
     else {
       Arm.setVelocity(70.0, percent);
       Arm.setStopping(coast);
       Arm.spinTo(30,deg,true);
       Arm.stop();
-      //Arm.spinFor(reverse, 175.0, degrees, true);
-      //Arm.stop();
-      //ArmButtonPressed = false;
     }
 }
 
@@ -336,14 +324,12 @@ void Arm_Move_back(void){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
   DaInertial.calibrate();
-  Brain.Screen.print("Calibrating Inertial");
+  Brain.Screen.print("Calibrating Inertial Sensor");
   while (DaInertial.isCalibrating())
   {
-    /* code */
     wait(20, msec);
   };
   Brain.Screen.clearScreen();
@@ -394,15 +380,11 @@ void auto_own(void){
   Arm_Move();
   wait(300,msec);
   drive_forward(108, speedLimit);
-  //Arm_Move_back();
   Arm.spinToPosition(130, deg, false);
   wait(20,msec);
   turn_left(90, TurnSpeedLimit);
   wait(20,msec);
-  //Arm.spinToPosition(150, deg, false);
   drive_backward(50,speedLimit);
-  //wait(20,msec);
-  //Arm_Move();
 }
 
 void auto_opposite(){
@@ -492,8 +474,6 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-
-
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
