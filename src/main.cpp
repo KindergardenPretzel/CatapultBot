@@ -15,8 +15,6 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-
-
 brain Brain;
 controller Controller1 = controller(primary);
 motor MotorLF = motor(PORT20, ratio18_1, true); // reversed 
@@ -33,7 +31,7 @@ inertial DaInertial = inertial(PORT10);
 motor_group LeftMotors = motor_group(MotorLF, MotorLB);
 motor_group RightMotors = motor_group(MotorRF, MotorRB);
 
-// Variables
+// Global Variables & Constants
 bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
   // 1 revolution = ~26cm
@@ -78,15 +76,11 @@ void push(){
  wait(300,msec);
  LeftMotors.stop();
  RightMotors.stop();
- //LeftMotors.spinFor(500,msec);
- //RightMotors.spinFor(500,msec);
 }
 
 
-
 void event_Wings(void){
-    if (!isArmOpen() && !WingButtonPressed) 
- {
+    if (!isArmOpen() && !WingButtonPressed) {
       if(!isRightWOpen())
       {
         RightWing.setVelocity(70.0, percent);
@@ -100,20 +94,19 @@ void event_Wings(void){
       }
       WingButtonPressed = true;
     }
-    
     else if (!isArmOpen() && WingButtonPressed) {
-    if(isLeftWOpen()){
-      LeftWing.setVelocity(60.0, percent);      
-      LeftWing.spinFor(reverse, 175.0, degrees, true);
-      LeftWing.stop(); 
-    }
-    if(isRightWOpen())
-    {
-      RightWing.setVelocity(70.0, percent);
-      RightWing.spinFor(forward, 175.0, degrees, true);
-      RightWing.stop();
-    }
-    WingButtonPressed = false;
+      if(isLeftWOpen()){
+        LeftWing.setVelocity(60.0, percent);      
+        LeftWing.spinFor(reverse, 175.0, degrees, true);
+        LeftWing.stop(); 
+      }
+      if(isRightWOpen())
+      {
+        RightWing.setVelocity(70.0, percent);
+        RightWing.spinFor(forward, 175.0, degrees, true);
+        RightWing.stop();
+      }
+      WingButtonPressed = false;
     }
 }
 
@@ -149,8 +142,6 @@ void event_Outake(void){
   RIntake.stop();
 }
 
-
-
 void event_Arm(void){
     if (!isArmOpen()) {
       Arm.setStopping(coast);
@@ -165,7 +156,6 @@ void event_Arm(void){
       Arm.stop();
     }
 }
-
 
 void turn_right(int DegreesToTurn, int VelocityMax) {
   // P control: error = degreeToTurn - current location
@@ -202,7 +192,7 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
   float Kp = 0.13;
-  float Ki = 0.009; // was 0.0015
+  float Ki = 0.009;
   float error;
   float speed;
   float integral = 0;
@@ -240,7 +230,7 @@ void drive_forward(int distanceToDrive, int VelocityMax){
     currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
     error = degreeToDrive - currentDegree;
     integral = integral + error;
-    if(error >= 100){  // ~15cm
+    if(error >= 100){  
       integral = 0;
     }
     speed = error * Kp + Ki * integral;
@@ -256,7 +246,7 @@ void drive_forward(int distanceToDrive, int VelocityMax){
 
 void drive_backward(int distanceToDrive, int VelocityMax){
   float Kp = 0.02;
-  float Ki = 0.001; // was 0.2
+  float Ki = 0.001; 
   float integral = 0;
   float error;
   float currentDegree;
@@ -269,7 +259,7 @@ void drive_backward(int distanceToDrive, int VelocityMax){
     currentDegree = (abs(RightMotors.position(deg)) + abs(LeftMotors.position(deg))) / 2;
     error = degreeToDrive - currentDegree;
     integral = integral + error;
-    if(error >= 100){  // ~15cm
+    if(error >= 100){  
       integral = 0;
     }
     speed = error * Kp + Ki * integral;
@@ -387,7 +377,7 @@ void auto_own(void){
   drive_backward(50,speedLimit);
 }
 
-void auto_opposite(){
+void auto_opposite(void){
   int speedLimit = 6;
   int TurnSpeedLimit = 7;
   drive_backward(120, speedLimit);
@@ -407,6 +397,7 @@ void auto_opposite(){
   drive_backward(89,speedLimit);
 }
 
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -421,15 +412,11 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  
-  //vex::task MyTask(ShowMeInfo);
-  
+    //vex::task MyTask(ShowMeInfo);
+
   auto_opposite();
   //auto_own();
   }
-
-
-
 
 
 /*---------------------------------------------------------------------------*/
