@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       OLEG DA bad                                             */
+/*    Author:       OLEG KHAVRONIUK                                           */
 /*    Created:      9/19/2023, 6:22:50 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
@@ -256,7 +256,7 @@ void drive_backward(int distanceToDrive, int VelocityMax){
   LeftMotors.resetPosition();
   do {
     wait(20,msec);
-    currentDegree = (abs(RightMotors.position(deg)) + abs(LeftMotors.position(deg))) / 2;
+    currentDegree = (fabs(RightMotors.position(deg)) + fabs(LeftMotors.position(deg))) / 2;
     error = degreeToDrive - currentDegree;
     integral = integral + error;
     if(error >= 100){  
