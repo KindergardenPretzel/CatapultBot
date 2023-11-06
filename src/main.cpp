@@ -42,6 +42,7 @@ motor_group RightMotors = motor_group(MotorRF, MotorRB);
 bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
 bool ArmButtonPressed = false;
+bool RWingButtonPressed = false;
   // 1 revolution = ~26cm
   // 60/36 Gear Ratio
   // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
@@ -175,6 +176,28 @@ void event_Arm(void){
       //Arm.spinFor(reverse, 175.0, degrees, true);
       //Arm.stop();
       //ArmButtonPressed = false;
+    }
+}
+
+void event_RightWing(void){
+  if (!isArmOpen() && !RWingButtonPressed) 
+ {
+    if(!isRightWOpen())
+    {
+      RightWing.setVelocity(70.0, percent);
+      RightWing.spinFor(reverse, 175.0, degrees, true);
+      RightWing.stop();
+    }
+    RWingButtonPressed = true;
+ }
+ else if (!isArmOpen() && RWingButtonPressed) {
+    if(isRightWOpen())
+    {
+      RightWing.setVelocity(70.0, percent);
+      RightWing.spinFor(forward, 175.0, degrees, true);
+      RightWing.stop();
+    }
+    RWingButtonPressed = false;
     }
 }
 
@@ -466,6 +489,7 @@ void usercontrol(void) {
   Controller1.ButtonR2.pressed(event_Outake);
   Controller1.ButtonR1.pressed(event_Intake);
   Controller1.ButtonB.pressed(event_Arm);
+  Controller1.ButtonRight.pressed(event_RightWing);
   wait(15, msec);
   // User control code here, inside the loop
   while (1) {
