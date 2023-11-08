@@ -35,6 +35,7 @@ motor_group RightMotors = motor_group(MotorRF, MotorRB);
 bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
 bool ArmButtonPressed = false;
+bool RWingButtonPressed = false;
   // 1 revolution = ~26cm
   // 60/36 Gear Ratio
   // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
