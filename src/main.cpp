@@ -170,8 +170,8 @@ void event_Arm(void){
     if (!isArmOpen()) {
       Arm.setStopping(coast);
     	Arm.setVelocity(70.0, percent);
-      Arm.spinTo(170,deg, true);
-      Arm.stop();
+      Arm.spinTo(75,deg, true); //was 170
+      Arm.stop(hold);
     }
     else {
       Arm.setVelocity(70.0, percent);
