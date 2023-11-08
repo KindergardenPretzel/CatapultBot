@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       OLEG DA bad                                             */
+/*    Author:       OLEG KHAVRONIUK                                           */
 /*    Created:      9/19/2023, 6:22:50 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
@@ -15,8 +15,6 @@ using namespace vex;
 competition Competition;
 
 // define your global instances of motors and other devices here
-
-
 brain Brain;
 controller Controller1 = controller(primary);
 motor MotorLF = motor(PORT20, ratio18_1, true); // reversed 
@@ -33,16 +31,10 @@ inertial DaInertial = inertial(PORT10);
 motor_group LeftMotors = motor_group(MotorLF, MotorLB);
 motor_group RightMotors = motor_group(MotorRF, MotorRB);
 
-
-
-
-
-// Variables
-
+// Global Variables & Constants
 bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
 bool ArmButtonPressed = false;
-bool RWingButtonPressed = false;
   // 1 revolution = ~26cm
   // 60/36 Gear Ratio
   // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
@@ -85,15 +77,11 @@ void push(){
  wait(300,msec);
  LeftMotors.stop();
  RightMotors.stop();
- //LeftMotors.spinFor(500,msec);
- //RightMotors.spinFor(500,msec);
 }
 
 
-
 void event_Wings(void){
-    if (!isArmOpen() && !WingButtonPressed) 
- {
+    if (!isArmOpen() && !WingButtonPressed) {
       if(!isRightWOpen())
       {
         RightWing.setVelocity(70.0, percent);
@@ -107,20 +95,19 @@ void event_Wings(void){
       }
       WingButtonPressed = true;
     }
-    
     else if (!isArmOpen() && WingButtonPressed) {
-    if(isLeftWOpen()){
-      LeftWing.setVelocity(60.0, percent);      
-      LeftWing.spinFor(reverse, 175.0, degrees, true);
-      LeftWing.stop(); 
-    }
-    if(isRightWOpen())
-    {
-      RightWing.setVelocity(70.0, percent);
-      RightWing.spinFor(forward, 175.0, degrees, true);
-      RightWing.stop();
-    }
-    WingButtonPressed = false;
+      if(isLeftWOpen()){
+        LeftWing.setVelocity(60.0, percent);      
+        LeftWing.spinFor(reverse, 175.0, degrees, true);
+        LeftWing.stop(); 
+      }
+      if(isRightWOpen())
+      {
+        RightWing.setVelocity(70.0, percent);
+        RightWing.spinFor(forward, 175.0, degrees, true);
+        RightWing.stop();
+      }
+      WingButtonPressed = false;
     }
 }
 
@@ -156,48 +143,18 @@ void event_Outake(void){
   RIntake.stop();
 }
 
-
-
 void event_Arm(void){
     if (!isArmOpen()) {
       Arm.setStopping(coast);
     	Arm.setVelocity(70.0, percent);
       Arm.spinTo(170,deg, true);
       Arm.stop();
-      //Arm.spinFor(forward, 150.0, degrees, true);
-      //Arm.stop();
-      //ArmButtonPressed = true;
     }
     else {
       Arm.setVelocity(70.0, percent);
       Arm.setStopping(coast);
       Arm.spinTo(30,deg,true);
       Arm.stop();
-      //Arm.spinFor(reverse, 175.0, degrees, true);
-      //Arm.stop();
-      //ArmButtonPressed = false;
-    }
-}
-
-void event_RightWing(void){
-  if (!isArmOpen() && !RWingButtonPressed) 
- {
-    if(!isRightWOpen())
-    {
-      RightWing.setVelocity(70.0, percent);
-      RightWing.spinFor(reverse, 175.0, degrees, true);
-      RightWing.stop();
-    }
-    RWingButtonPressed = true;
- }
- else if (!isArmOpen() && RWingButtonPressed) {
-    if(isRightWOpen())
-    {
-      RightWing.setVelocity(70.0, percent);
-      RightWing.spinFor(forward, 175.0, degrees, true);
-      RightWing.stop();
-    }
-    RWingButtonPressed = false;
     }
 }
 
@@ -237,7 +194,7 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   // PI control: integral = integral + error 
   // speed = Kp * error + Ki * integral
   float Kp = 0.13;
-  float Ki = 0.009; // was 0.0015
+  float Ki = 0.009;
   float error;
   float speed;
   float integral = 0;
@@ -275,7 +232,7 @@ void drive_forward(int distanceToDrive, int VelocityMax){
     currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
     error = degreeToDrive - currentDegree;
     integral = integral + error;
-    if(error >= 100){  // ~15cm
+    if(error >= 100){  
       integral = 0;
     }
     speed = error * Kp + Ki * integral;
@@ -291,7 +248,7 @@ void drive_forward(int distanceToDrive, int VelocityMax){
 
 void drive_backward(int distanceToDrive, int VelocityMax){
   float Kp = 0.02;
-  float Ki = 0.001; // was 0.2
+  float Ki = 0.001; 
   float integral = 0;
   float error;
   float currentDegree;
@@ -301,10 +258,10 @@ void drive_backward(int distanceToDrive, int VelocityMax){
   LeftMotors.resetPosition();
   do {
     wait(20,msec);
-    currentDegree = (abs(RightMotors.position(deg)) + abs(LeftMotors.position(deg))) / 2;
+    currentDegree = (fabs(RightMotors.position(deg)) + fabs(LeftMotors.position(deg))) / 2;
     error = degreeToDrive - currentDegree;
     integral = integral + error;
-    if(error >= 100){  // ~15cm
+    if(error >= 100){  
       integral = 0;
     }
     speed = error * Kp + Ki * integral;
@@ -359,14 +316,12 @@ void Arm_Move_back(void){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
   DaInertial.calibrate();
-  Brain.Screen.print("Calibrating Inertial");
+  Brain.Screen.print("Calibrating Inertial Sensor");
   while (DaInertial.isCalibrating())
   {
-    /* code */
     wait(20, msec);
   };
   Brain.Screen.clearScreen();
@@ -417,18 +372,14 @@ void auto_own(void){
   Arm_Move();
   wait(300,msec);
   drive_forward(108, speedLimit);
-  //Arm_Move_back();
   Arm.spinToPosition(130, deg, false);
   wait(20,msec);
   turn_left(90, TurnSpeedLimit);
   wait(20,msec);
-  //Arm.spinToPosition(150, deg, false);
   drive_backward(50,speedLimit);
-  //wait(20,msec);
-  //Arm_Move();
 }
 
-void auto_opposite(){
+void auto_opposite(void){
   int speedLimit = 6;
   int TurnSpeedLimit = 7;
   drive_backward(120, speedLimit);
@@ -448,6 +399,7 @@ void auto_opposite(){
   drive_backward(89,speedLimit);
 }
 
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -462,15 +414,11 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  
-  vex::task MyTask(ShowMeInfo);
-  
-  //auto_opposite();
-  auto_own();
+    //vex::task MyTask(ShowMeInfo);
+
+  auto_opposite();
+  //auto_own();
   }
-
-
-
 
 
 /*---------------------------------------------------------------------------*/
@@ -516,8 +464,6 @@ int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-
-
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
