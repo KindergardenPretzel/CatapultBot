@@ -21,7 +21,7 @@ motor MotorLF = motor(PORT20, ratio18_1, true); // reversed
 motor MotorLB = motor(PORT19, ratio18_1, true); // reversed
 motor MotorRF = motor(PORT11, ratio18_1, false); // forward direction
 motor MotorRB = motor(PORT12, ratio18_1, false); // forward direction
-motor Shooter = motor(PORT5, ratio18_1, false);
+motor Shooter = motor(PORT4, ratio36_1, false);
 motor LeftWing = motor(PORT6, ratio18_1, false);
 motor RightWing = motor(PORT7, ratio18_1, false);
 motor LIntake = motor(PORT1, ratio18_1, false);
@@ -379,6 +379,22 @@ void auto_own(void){
   drive_backward(50,speedLimit);
 }
 
+void auto_own_alone(void){
+  int speedLimit = 7;
+  int TurnSpeedLimit = 6;
+  drive_backward(120, speedLimit);
+  wait(20, msec);
+  turn_right(90, TurnSpeedLimit);
+  wait(20, msec);
+  outake_on();
+  wait(20,msec);
+  push();
+  outake_off();
+  wait(20,msec);
+  drive_backward(67, speedLimit);
+}
+
+
 void auto_opposite(void){
   int speedLimit = 6;
   int TurnSpeedLimit = 7;
@@ -416,8 +432,9 @@ void autonomous(void) {
   // ..........................................................................
     //vex::task MyTask(ShowMeInfo);
 
-  auto_opposite();
+  //auto_opposite();
   //auto_own();
+  auto_own_alone();
   }
 
 
@@ -456,6 +473,8 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+  ShootButtonPressed = false;
+  WingButtonPressed = false;
   LeftWing.resetPosition();
   RightWing.resetPosition();
   Arm.resetPosition();
