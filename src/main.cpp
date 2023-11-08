@@ -111,6 +111,28 @@ void event_Wings(void){
     }
 }
 
+void event_RightWing(void){
+  if (!isArmOpen() && !RWingButtonPressed)
+ {
+    if(!isRightWOpen())
+    {
+      RightWing.setVelocity(70.0, percent);
+      RightWing.spinFor(reverse, 175.0, degrees, true);
+      RightWing.stop();
+    }
+    RWingButtonPressed = true;
+ }
+ else if (!isArmOpen() && RWingButtonPressed) {
+    if(isRightWOpen())
+    {
+      RightWing.setVelocity(70.0, percent);
+      RightWing.spinFor(forward, 175.0, degrees, true);
+      RightWing.stop();
+    }
+    RWingButtonPressed = false;
+     }
+}
+
 void event_Catapult(void){
       if (!ShootButtonPressed) {
         Shooter.setVelocity(80.0, percent);
