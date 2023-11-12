@@ -11,5 +11,7 @@ struct PID{
 };
 
 void initPID(PID &pid, double Kp, double Ki, double Kd, double limitIntegral, double minOutput, double maxOutput);
+void setPIDmax(PID &pid, double maxOutput);
+void setPIDmin(PID &pid, double minOutput);
 double calculatePID(PID &pid, double destination, double current);
 void resetPID(PID &pid);

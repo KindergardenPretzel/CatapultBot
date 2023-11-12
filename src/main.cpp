@@ -243,24 +243,25 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   LeftMotors.stop(hold);
 }
 
-void drive_forward(int distanceToDrive, int VelocityMax=12){
+void drive_forward(int distanceToDrive,int VelocityMax=12, int VelocityMin=2){
   float currentDegree;
   double speed;
   float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
   RightMotors.resetPosition();
   LeftMotors.resetPosition();
+  setPIDmax(drivePID, VelocityMax);
+  setPIDmin(drivePID, VelocityMin);
   do {
     wait(20,msec);
     currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
     speed = calculatePID(drivePID, degreeToDrive, currentDegree);
-    if (speed >= VelocityMax) {
-      speed = VelocityMax;
-    }
     RightMotors.spin(forward, speed, volt);
     LeftMotors.spin(forward, speed, volt);
-  } while(fabs(currentDegree - degreeToDrive) < 0.5);
+
+  } while(fabs(degreeToDrive - currentDegree) > 3);
   RightMotors.stop(brake);
   LeftMotors.stop(brake);
+  resetPID(drivePID);
 }
 
 void drive_backward(int distanceToDrive, int VelocityMax){
@@ -269,20 +270,18 @@ void drive_backward(int distanceToDrive, int VelocityMax){
   float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
   RightMotors.resetPosition();
   LeftMotors.resetPosition();
+  setPIDmax(drivePID, VelocityMax);
   do {
     wait(20,msec);
     currentDegree = (fabs(RightMotors.position(deg)) + fabs(LeftMotors.position(deg))) / 2;
     speed = calculatePID(drivePID, degreeToDrive, currentDegree);
-    if(speed >= VelocityMax){  
-      speed = VelocityMax;
-    }
     LeftMotors.spin(reverse, speed, volt);
     RightMotors.spin(reverse, speed, volt);
-
-  } while(fabs(currentDegree - degreeToDrive) < 0.5);
+  } while(fabs(degreeToDrive - currentDegree) > 3);
 
   LeftMotors.stop(brake);
   RightMotors.stop(brake);
+  resetPID(drivePID);
 }
 
 void outake_off(void){
@@ -439,10 +438,10 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
     //vex::task MyTask(ShowMeInfo);
-
+  drive_forward(20);
   //auto_opposite();
   //auto_own();
-  auto_own_alone();
+  //auto_own_alone();
   }
 
 

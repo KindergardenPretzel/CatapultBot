@@ -16,8 +16,17 @@ void resetPID(PID &pid){
     pid.firstRun = true;
 }
 
+void setPIDmax(PID &pid, double maxOutput) {
+    pid.maxOutput = maxOutput;
+}
+
+void setPIDmin(PID &pid, double minOutput){
+    pid.minOutput = minOutput;
+}
+
 double calculatePID(PID &pid, double destination, double current){
     double error;
+    double gain = 0;
     double proportionalGain = 0;
     double integralGain = 0;
     double derivativeGain = 0;
@@ -41,5 +50,13 @@ double calculatePID(PID &pid, double destination, double current){
     derivativeGain = (error - pid.prevError) * pid.Kd;
 
     pid.prevError = error;
-    return proportionalGain + integralGain + derivativeGain;
+
+    gain = proportionalGain + integralGain + derivativeGain;
+    if (gain > pid.maxOutput) {
+        gain = pid.maxOutput;
+    }
+    if (gain < pid.minOutput) {
+        gain = pid.minOutput;
+    }    
+    return gain;
 }
