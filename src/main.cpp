@@ -8,6 +8,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
+#include "PID.h"
 
 using namespace vex;
 
@@ -36,6 +37,8 @@ bool ShootButtonPressed = false;
 bool WingButtonPressed = false;
 bool ArmButtonPressed = false;
 bool RWingButtonPressed = false;
+PID drivePID;
+PID turnPID;
   // 1 revolution = ~26cm
   // 60/36 Gear Ratio
   // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
@@ -240,40 +243,27 @@ void turn_left(int DegreesToTurn, int VelocityMax) {
   LeftMotors.stop(hold);
 }
 
-void drive_forward(int distanceToDrive, int VelocityMax){
-  float Kp = 0.02;
-  float Ki = 0.001; 
-  float integral = 0;
-  float error;
+void drive_forward(int distanceToDrive, int VelocityMax=12){
   float currentDegree;
-  float speed;
+  double speed;
   float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
   RightMotors.resetPosition();
   LeftMotors.resetPosition();
   do {
     wait(20,msec);
     currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
-    error = degreeToDrive - currentDegree;
-    integral = integral + error;
-    if(error >= 100){  
-      integral = 0;
-    }
-    speed = error * Kp + Ki * integral;
-    if (speed > VelocityMax) {
+    speed = calculatePID(drivePID, degreeToDrive, currentDegree);
+    if (speed >= VelocityMax) {
       speed = VelocityMax;
     }
     RightMotors.spin(forward, speed, volt);
     LeftMotors.spin(forward, speed, volt);
-  } while(currentDegree < degreeToDrive);
+  } while(fabs(currentDegree - degreeToDrive) < 0.5);
   RightMotors.stop(brake);
   LeftMotors.stop(brake);
 }
 
 void drive_backward(int distanceToDrive, int VelocityMax){
-  float Kp = 0.02;
-  float Ki = 0.001; 
-  float integral = 0;
-  float error;
   float currentDegree;
   float speed;
   float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
@@ -282,22 +272,17 @@ void drive_backward(int distanceToDrive, int VelocityMax){
   do {
     wait(20,msec);
     currentDegree = (fabs(RightMotors.position(deg)) + fabs(LeftMotors.position(deg))) / 2;
-    error = degreeToDrive - currentDegree;
-    integral = integral + error;
-    if(error >= 100){  
-      integral = 0;
-    }
-    speed = error * Kp + Ki * integral;
-    if (speed > VelocityMax) {
+    speed = calculatePID(drivePID, degreeToDrive, currentDegree);
+    if(speed >= VelocityMax){  
       speed = VelocityMax;
     }
     LeftMotors.spin(reverse, speed, volt);
     RightMotors.spin(reverse, speed, volt);
 
-  } while(currentDegree < degreeToDrive);
+  } while(fabs(currentDegree - degreeToDrive) < 0.5);
 
-  LeftMotors.stop(hold);
-  RightMotors.stop(hold);
+  LeftMotors.stop(brake);
+  RightMotors.stop(brake);
 }
 
 void outake_off(void){
@@ -496,6 +481,11 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+
+
+  initPID(drivePID, 0.02, 0.001, 0.01, 40, 2, 10);
+  initPID(turnPID, 0.13, 0.009, 0.065, 15, 2, 10);
+
   ShootButtonPressed = false;
   WingButtonPressed = false;
   LeftWing.resetPosition();

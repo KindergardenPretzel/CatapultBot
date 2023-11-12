@@ -17,7 +17,7 @@ void resetPID(PID &pid){
 }
 
 double calculatePID(PID &pid, double destination, double current){
-    double errror;
+    double error;
     double proportionalGain = 0;
     double integralGain = 0;
     double derivativeGain = 0;
