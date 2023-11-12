@@ -258,7 +258,7 @@ void drive_forward(int distanceToDrive,int VelocityMax=12, int VelocityMin=2){
     RightMotors.spin(forward, speed, volt);
     LeftMotors.spin(forward, speed, volt);
 
-  } while(fabs(degreeToDrive - currentDegree) > 3);
+  } while(degreeToDrive - currentDegree > 3);
   RightMotors.stop(brake);
   LeftMotors.stop(brake);
   resetPID(drivePID);
@@ -277,7 +277,7 @@ void drive_backward(int distanceToDrive, int VelocityMax){
     speed = calculatePID(drivePID, degreeToDrive, currentDegree);
     LeftMotors.spin(reverse, speed, volt);
     RightMotors.spin(reverse, speed, volt);
-  } while(fabs(degreeToDrive - currentDegree) > 3);
+  } while(degreeToDrive - currentDegree > 3);
 
   LeftMotors.stop(brake);
   RightMotors.stop(brake);
@@ -438,7 +438,7 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
     //vex::task MyTask(ShowMeInfo);
-  drive_forward(20);
+  drive_forward(100, 12, 2);
   //auto_opposite();
   //auto_own();
   //auto_own_alone();

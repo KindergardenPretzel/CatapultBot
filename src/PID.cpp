@@ -1,6 +1,6 @@
 #include <PID.h>
 
-void initPID(PID &pid,double Kp, double Ki, double Kd, double limitIntegral, double minOutput, double maxOutput){
+void initPID(PID &pid,double Kp, double Ki, double Kd, double limitIntegral, double minOutput=2, double maxOutput=12){
     pid.Kp = Kp;
     pid.Ki = Ki;
     pid.Kd = Kd;
