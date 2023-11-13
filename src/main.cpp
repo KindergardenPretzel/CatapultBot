@@ -39,6 +39,7 @@ bool ArmButtonPressed = false;
 bool RWingButtonPressed = false;
 PID drivePID;
 PID turnPID;
+PID straightPID;
   // 1 revolution = ~26cm
   // 60/36 Gear Ratio
   // One Rev is 360 degrees and 25.9207*(60/36) = 43.20cm
@@ -222,44 +223,57 @@ void turn_left(int DegreesToTurn, int VelocityMin=2, int VelocityMax=12) {
 }
 
 void drive_forward(int distanceToDrive, int VelocityMin=2, int VelocityMax=12){
+  float yaw;
+  double correction;
   float currentDegree;
   double speed;
   float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
   RightMotors.resetPosition();
   LeftMotors.resetPosition();
+  DaInertial.resetRotation();
   setPIDmax(drivePID, VelocityMax);
   setPIDmin(drivePID, VelocityMin);
   do {
     wait(20,msec);
     currentDegree = (RightMotors.position(deg) + LeftMotors.position(deg)) / 2;
     speed = calculatePID(drivePID, degreeToDrive, currentDegree);
-    RightMotors.spin(forward, speed, volt);
-    LeftMotors.spin(forward, speed, volt);
+    yaw = DaInertial.rotation();
+    correction = calculatePID(straightPID, 0, yaw);
+
+    RightMotors.spin(forward, speed - correction, volt);
+    LeftMotors.spin(forward, speed + correction, volt);
   } while(degreeToDrive - currentDegree > 3);
   RightMotors.stop(brake);
   LeftMotors.stop(brake);
   resetPID(drivePID);
+  resetPID(straightPID);
 }
 
 void drive_backward(int distanceToDrive, int VelocityMin=2, int VelocityMax=12){
+  float yaw;
+  double correction;
   float currentDegree;
   float speed;
   float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
   RightMotors.resetPosition();
   LeftMotors.resetPosition();
+  DaInertial.resetRotation();
   setPIDmax(drivePID, VelocityMax);
   setPIDmin(drivePID, VelocityMin);
   do {
     wait(20,msec);
     currentDegree = (fabs(RightMotors.position(deg)) + fabs(LeftMotors.position(deg))) / 2;
     speed = calculatePID(drivePID, degreeToDrive, currentDegree);
-    LeftMotors.spin(reverse, speed, volt);
-    RightMotors.spin(reverse, speed, volt);
+    yaw = DaInertial.rotation();
+    correction = calculatePID(straightPID, 0, yaw);
+    LeftMotors.spin(reverse, speed - correction, volt);
+    RightMotors.spin(reverse, speed + correction, volt);
   } while(degreeToDrive - currentDegree > 3);
 
   LeftMotors.stop(brake);
   RightMotors.stop(brake);
   resetPID(drivePID);
+  resetPID(straightPID);
 }
 
 void outake_off(void){
@@ -319,17 +333,20 @@ int ShowMeInfo(){
     Brain.Screen.setCursor(5,1);
     Brain.Screen.print(DaInertial.heading(degrees));
     Brain.Screen.setCursor(6,1);
-    Brain.Screen.print("Inertial Rotate");
+    Brain.Screen.print("Inertial Rotation");
     Brain.Screen.setCursor(7,1);
     Brain.Screen.print(DaInertial.rotation(degrees)); 
     Brain.Screen.setCursor(8,1);
-    Brain.Screen.print(" Motors");
+    Brain.Screen.print(" Motors Left/Right/Arm");
     Brain.Screen.setCursor(9,1);
     Brain.Screen.print(LeftMotors.position(rotationUnits::deg)); 
     Brain.Screen.setCursor(10,1);
     Brain.Screen.print(RightMotors.position(rotationUnits::deg));
     Brain.Screen.setCursor(11,1);
     Brain.Screen.print(Arm.position(rotationUnits::deg));
+    Brain.Screen.setCursor(12,1);
+    Brain.Screen.print(straightPID.totalGain);
+
 
     wait(25, msec);
   } 
@@ -422,18 +439,7 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  //drive_forward(100, 12, 2);
-    wait(1, sec);
-  wait(1, sec);
-
-  turn_left(90);
-  wait(1, sec);
-  turn_left(90);
-  wait(1, sec);
-  turn_left(90);
-  wait(1, sec);
-  turn_left(90);
-  wait(1, sec);  
+  drive_forward(190, 2, 12);
   //auto_opposite();
   //auto_own();
   //auto_own_alone();
@@ -475,16 +481,15 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-
-
   initPID(drivePID, 0.02, 0.001, 0.01, 40, 2, 10);
   initPID(turnPID, 0.08, 0.009, 0.05, 5, 2, 10);
-
+  initPID(straightPID, 0.15, 0, 0.4, 1, -3, 3);
   ShootButtonPressed = false;
   WingButtonPressed = false;
   LeftWing.resetPosition();
   RightWing.resetPosition();
   Arm.resetPosition();
+
   // Run the pre-autonomous function.
   pre_auton();
   // Set up callbacks for autonomous and driver control periods.

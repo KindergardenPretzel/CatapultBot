@@ -58,5 +58,6 @@ double calculatePID(PID &pid, double destination, double current){
     if (totalGain < pid.minOutput) {
         totalGain = pid.minOutput;
     }    
+    pid.totalGain = totalGain;
     return totalGain;
 }

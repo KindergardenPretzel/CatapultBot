@@ -8,6 +8,7 @@ struct PID{
     double maxOutput;
     double minOutput;
     double firstRun;
+    double totalGain;
 };
 
 void initPID(PID &pid, double Kp, double Ki, double Kd, double limitIntegral, double minOutput, double maxOutput);
