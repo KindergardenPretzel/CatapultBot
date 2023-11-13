@@ -221,7 +221,7 @@ void turn_left(int DegreesToTurn, int VelocityMin=2, int VelocityMax=12) {
   resetPID(turnPID);
 }
 
-void drive_forward(int distanceToDrive,int VelocityMax=12, int VelocityMin=2){
+void drive_forward(int distanceToDrive, int VelocityMin=2, int VelocityMax=12){
   float currentDegree;
   double speed;
   float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
@@ -235,20 +235,20 @@ void drive_forward(int distanceToDrive,int VelocityMax=12, int VelocityMin=2){
     speed = calculatePID(drivePID, degreeToDrive, currentDegree);
     RightMotors.spin(forward, speed, volt);
     LeftMotors.spin(forward, speed, volt);
-
   } while(degreeToDrive - currentDegree > 3);
   RightMotors.stop(brake);
   LeftMotors.stop(brake);
   resetPID(drivePID);
 }
 
-void drive_backward(int distanceToDrive, int VelocityMax){
+void drive_backward(int distanceToDrive, int VelocityMin=2, int VelocityMax=12){
   float currentDegree;
   float speed;
   float degreeToDrive = DEGREE_PER_CM * distanceToDrive;
   RightMotors.resetPosition();
   LeftMotors.resetPosition();
   setPIDmax(drivePID, VelocityMax);
+  setPIDmin(drivePID, VelocityMin);
   do {
     wait(20,msec);
     currentDegree = (fabs(RightMotors.position(deg)) + fabs(LeftMotors.position(deg))) / 2;
@@ -337,67 +337,73 @@ int ShowMeInfo(){
 }
 
 void auto_own(void){
-  int speedLimit = 7;
-  int TurnSpeedLimit = 6;
-  drive_backward(120, speedLimit);
+  int speedMin = 2;
+  int speedMax = 7;
+  int turnSpeedMin = 2;
+  int turnSpeedMax = 6;
+  drive_backward(120, speedMin, speedMax);
   wait(20, msec);
-  turn_right(90, TurnSpeedLimit);
+  turn_right(90, turnSpeedMin, turnSpeedMax);
   wait(20, msec);
   outake_on();
   wait(20,msec);
   push();
   outake_off();
   wait(20,msec);
-  drive_backward(67, speedLimit);
+  drive_backward(67, speedMin, speedMax);
   wait(20,msec);
-  turn_right(135, TurnSpeedLimit);
+  turn_right(135, turnSpeedMin, turnSpeedMax);
   wait(20,msec);
-  drive_backward(145,speedLimit);
+  drive_backward(145, speedMin, speedMax);
   wait(20,msec);
   Arm_Move();
   wait(300,msec);
-  drive_forward(108, speedLimit);
+  drive_forward(108, speedMin, speedMax);
   Arm.spinToPosition(130, deg, false);
   wait(20,msec);
-  turn_left(90, TurnSpeedLimit);
+  turn_left(90, turnSpeedMin, turnSpeedMax);
   wait(20,msec);
-  drive_backward(50,speedLimit);
+  drive_backward(50, speedMin, speedMax);
 }
 
 void auto_own_alone(void){
-  int speedLimit = 7;
-  int TurnSpeedLimit = 6;
-  drive_backward(120, speedLimit);
+  int speedMin = 2;
+  int speedMax = 7;
+  int turnSpeedMin = 2;
+  int turnSpeedMax = 6;
+  drive_backward(120, speedMin, speedMax);
   wait(20, msec);
-  turn_right(90, TurnSpeedLimit);
+  turn_right(90, turnSpeedMin, turnSpeedMax);
   wait(20, msec);
   outake_on();
   wait(20,msec);
   push();
   outake_off();
   wait(20,msec);
-  drive_backward(67, speedLimit);
+  drive_backward(67, speedMin, speedMax);
 }
 
 
 void auto_opposite(void){
-  int speedLimit = 6;
-  int TurnSpeedLimit = 7;
-  drive_backward(120, speedLimit);
+  int speedMin = 2;
+  int speedMax = 7;
+  int turnSpeedMin = 2;
+  int turnSpeedMax = 6;
+  drive_backward(120, speedMin, speedMax);
   wait(20, msec);
-  turn_left(90, TurnSpeedLimit);
+  turn_left(90, turnSpeedMin, turnSpeedMax);
   wait(20, msec);
   outake_on();
   wait(40,msec);
   push();  
   wait(40,msec); 
-  drive_backward(10, speedLimit);
+  drive_backward(10, speedMin, speedMax);
   outake_off();
   wait(20,msec);
-  turn_left(45, TurnSpeedLimit);
+  turn_left(45, turnSpeedMin, turnSpeedMax);
   wait(20,msec);
   Arm.spinTo(130, deg, false);
-  drive_backward(89,speedLimit);
+  drive_backward(89,speedMin, speedMax);
 }
 
 
