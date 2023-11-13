@@ -26,7 +26,7 @@ void setPIDmin(PID &pid, double minOutput){
 
 double calculatePID(PID &pid, double destination, double current){
     double error;
-    double gain = 0;
+    double totalGain = 0;
     double proportionalGain = 0;
     double integralGain = 0;
     double derivativeGain = 0;
@@ -48,15 +48,15 @@ double calculatePID(PID &pid, double destination, double current){
     integralGain = pid.Ki * pid.integral;
     
     derivativeGain = (error - pid.prevError) * pid.Kd;
-
     pid.prevError = error;
 
-    gain = proportionalGain + integralGain + derivativeGain;
-    if (gain > pid.maxOutput) {
-        gain = pid.maxOutput;
+    totalGain = proportionalGain + integralGain + derivativeGain;
+    
+    if (totalGain > pid.maxOutput) {
+        totalGain = pid.maxOutput;
     }
-    if (gain < pid.minOutput) {
-        gain = pid.minOutput;
+    if (totalGain < pid.minOutput) {
+        totalGain = pid.minOutput;
     }    
-    return gain;
+    return totalGain;
 }
