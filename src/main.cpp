@@ -185,62 +185,40 @@ void event_Arm(void){
 }
 
 
-void turn_right(int DegreesToTurn, int VelocityMax) {
-  // P control: error = degreeToTurn - current location
-  // Speeed = Kp * error
-  // PI control: integral = integral + error 
-  // speed = Kp * error + Ki * integral
-  float Kp = 0.13;
-  float Ki = 0.001; // was 0.0015
-  float error;
+void turn_right(int DegreesToTurn, int VelocityMin=2, int VelocityMax=12) {
   float speed;
-  float integral = 0;
+  float currentDegrees;
+  setPIDmin(turnPID, VelocityMin);
+  setPIDmax(turnPID, VelocityMax);
   DaInertial.resetRotation();
   do {
     wait(20, msec);
-    error = DegreesToTurn - DaInertial.rotation();
-    integral = integral + error;
-    if(error >= 5){ 
-      integral = 0;
-    }
-    speed = Kp * error + Ki * integral;
-    if (speed > VelocityMax) {
-      speed = VelocityMax;
-    }
+    currentDegrees = DaInertial.rotation();
+    speed = calculatePID(turnPID,DegreesToTurn, currentDegrees);
     RightMotors.spin(reverse, speed, volt);
     LeftMotors.spin(forward, speed, volt);
-  } while(DaInertial.rotation() > DegreesToTurn + 1 or DaInertial.rotation() < DegreesToTurn - 1);
+  } while(DegreesToTurn - currentDegrees > 0);
   RightMotors.stop(hold);
   LeftMotors.stop(hold);
+  resetPID(turnPID);
 }
 
-void turn_left(int DegreesToTurn, int VelocityMax) {
-  // P control: error = degreeToTurn - current location
-  // Speeed = Kp * error
-  // PI control: integral = integral + error 
-  // speed = Kp * error + Ki * integral
-  float Kp = 0.13;
-  float Ki = 0.009;
-  float error;
+void turn_left(int DegreesToTurn, int VelocityMin=2, int VelocityMax=12) {
   float speed;
-  float integral = 0;
+  float currentDegrees;
   DaInertial.resetRotation();
+  setPIDmin(turnPID, VelocityMin);
+  setPIDmax(turnPID, VelocityMax);
   do {
     wait(20, msec);
-    error = DegreesToTurn - fabs(DaInertial.rotation());
-    integral = integral + error;
-    if(error >= 10){ 
-      integral = 0;
-    }
-    speed = Kp * error + Ki * integral;
-    if (speed > VelocityMax) {
-      speed = VelocityMax;
-    }
+    currentDegrees = fabs(DaInertial.rotation());
+    speed = calculatePID(turnPID, DegreesToTurn, currentDegrees);
     RightMotors.spin(forward, speed, volt);
     LeftMotors.spin(reverse, speed, volt);
-  } while(fabs(DaInertial.rotation()) > DegreesToTurn + 1 or fabs(DaInertial.rotation()) < DegreesToTurn - 1);
+  } while(DegreesToTurn - currentDegrees > 0);
   RightMotors.stop(hold);
   LeftMotors.stop(hold);
+  resetPID(turnPID);
 }
 
 void drive_forward(int distanceToDrive,int VelocityMax=12, int VelocityMin=2){
@@ -437,8 +415,19 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-    //vex::task MyTask(ShowMeInfo);
-  drive_forward(100, 12, 2);
+  vex::task MyTask(ShowMeInfo);
+  //drive_forward(100, 12, 2);
+    wait(1, sec);
+  wait(1, sec);
+
+  turn_left(90);
+  wait(1, sec);
+  turn_left(90);
+  wait(1, sec);
+  turn_left(90);
+  wait(1, sec);
+  turn_left(90);
+  wait(1, sec);  
   //auto_opposite();
   //auto_own();
   //auto_own_alone();
@@ -483,7 +472,7 @@ int main() {
 
 
   initPID(drivePID, 0.02, 0.001, 0.01, 40, 2, 10);
-  initPID(turnPID, 0.13, 0.009, 0.065, 15, 2, 10);
+  initPID(turnPID, 0.08, 0.009, 0.05, 5, 2, 10);
 
   ShootButtonPressed = false;
   WingButtonPressed = false;
