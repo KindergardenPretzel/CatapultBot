@@ -344,10 +344,6 @@ int ShowMeInfo(){
     Brain.Screen.print(RightMotors.position(rotationUnits::deg));
     Brain.Screen.setCursor(11,1);
     Brain.Screen.print(Arm.position(rotationUnits::deg));
-    Brain.Screen.setCursor(12,1);
-    Brain.Screen.print(straightPID.totalGain);
-
-
     wait(25, msec);
   } 
   return 0;
