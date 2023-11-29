@@ -186,7 +186,7 @@ void event_Arm(void){
 }
 
 
-void turn_right(int DegreesToTurn, int VelocityMin=2, int VelocityMax=12) {
+void turn_right(int DegreesToTurn, float VelocityMin=2, float VelocityMax=12) {
   float speed;
   float currentDegrees;
   setPIDmin(turnPID, VelocityMin);
@@ -204,7 +204,7 @@ void turn_right(int DegreesToTurn, int VelocityMin=2, int VelocityMax=12) {
   resetPID(turnPID);
 }
 
-void turn_left(int DegreesToTurn, int VelocityMin=2, int VelocityMax=12) {
+void turn_left(int DegreesToTurn, float VelocityMin=2, float VelocityMax=12) {
   float speed;
   float currentDegrees;
   DaInertial.resetRotation();
@@ -222,7 +222,7 @@ void turn_left(int DegreesToTurn, int VelocityMin=2, int VelocityMax=12) {
   resetPID(turnPID);
 }
 
-void drive_forward(int distanceToDrive, int VelocityMin=2, int VelocityMax=12){
+void drive_forward(int distanceToDrive, float VelocityMin=2, float VelocityMax=12){
   float yaw;
   double correction;
   float currentDegree;
@@ -249,7 +249,7 @@ void drive_forward(int distanceToDrive, int VelocityMin=2, int VelocityMax=12){
   resetPID(straightPID);
 }
 
-void drive_backward(int distanceToDrive, int VelocityMin=2, int VelocityMax=12){
+void drive_backward(int distanceToDrive, float VelocityMin=2, float VelocityMax=12){
   float yaw;
   double correction;
   float currentDegree;
@@ -435,7 +435,6 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  drive_forward(190, 2, 12);
   //auto_opposite();
   //auto_own();
   //auto_own_alone();
