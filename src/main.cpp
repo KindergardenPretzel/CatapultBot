@@ -75,8 +75,8 @@ bool isLeftWOpen(){
 
 
 void push(){
- LeftMotors.setVelocity(100,pct);
- RightMotors.setVelocity(100,pct);
+ LeftMotors.setVelocity(60,pct);
+ RightMotors.setVelocity(60,pct);
  LeftMotors.spin(forward);
  RightMotors.spin(forward);
  wait(300,msec);
@@ -358,25 +358,33 @@ void auto_own(void){
   wait(20, msec);
   turn_right(90, turnSpeedMin, turnSpeedMax);
   wait(20, msec);
+  drive_forward(7, 4, speedMax);
+  wait(20, msec);
   outake_on();
-  wait(20,msec);
-  push();
+  drive_forward(3, 4, speedMax);
+  wait(300,msec);
   outake_off();
   wait(20,msec);
-  drive_backward(67, speedMin, speedMax);
+  drive_backward(10, 6, speedMax);
   wait(20,msec);
-  turn_right(135, turnSpeedMin, turnSpeedMax);
+  turn_right(90, turnSpeedMin, speedMax);
   wait(20,msec);
-  drive_backward(145, speedMin, speedMax);
+  drive_backward(55, speedMin, speedMax);
+  wait(20,msec);
+  turn_right(45, turnSpeedMin, speedMax);
+  wait(20,msec);
+  drive_backward(66, speedMin, speedMax);
   wait(20,msec);
   Arm_Move();
-  wait(300,msec);
-  drive_forward(108, speedMin, speedMax);
-  Arm.spinToPosition(130, deg, false);
   wait(20,msec);
-  turn_left(90, turnSpeedMin, turnSpeedMax);
+  turn_left(125, turnSpeedMin, turnSpeedMax);
   wait(20,msec);
-  drive_backward(50, speedMin, speedMax);
+  Arm.spinToPosition(80, deg, false);
+  wait(20,msec);
+  drive_backward(115, 4, speedMax);
+  exit(0);
+
+
 }
 
 void auto_own_alone(void){
@@ -419,6 +427,22 @@ void auto_opposite(void){
   drive_backward(89,speedMin, speedMax);
 }
 
+void coolAuton(void){
+  int speedMin = 2;
+  int speedMax = 7;
+  int turnSpeedMin = 2;
+  int turnSpeedMax = 6;
+  drive_forward(75, 6, speedMax);
+  wait(20, msec);
+  turn_right(45, 4, turnSpeedMax);
+  wait(20, msec);
+  outake_on();
+  wait(100, msec);
+  push();
+  push();
+  outake_off();
+}
+
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -436,8 +460,9 @@ void autonomous(void) {
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
   //auto_opposite();
-  //auto_own();
+  auto_own();
   //auto_own_alone();
+  //coolAuton();
   }
 
 
