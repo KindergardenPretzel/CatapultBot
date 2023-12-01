@@ -90,12 +90,14 @@ void event_Wings(void){
       if(!isRightWOpen())
       {
         RightWing.setVelocity(70.0, percent);
-        RightWing.spinFor(reverse, 175.0, degrees, true);
+        //RightWing.spinFor(reverse, 175.0, degrees, true);
+        RightWing.spinTo(-140, deg,true);
         RightWing.stop();
       }
       if(!isLeftWOpen()){
         LeftWing.setVelocity(60.0, percent);      
-        LeftWing.spinFor(forward, 175.0, degrees, true);
+        LeftWing.spinTo(140, deg,true);
+        //LeftWing.spinFor(forward, 175.0, degrees, true);
         LeftWing.stop(); 
       }
       WingButtonPressed = true;
@@ -103,13 +105,15 @@ void event_Wings(void){
     else if (!isArmOpen() && WingButtonPressed) {
       if(isLeftWOpen()){
         LeftWing.setVelocity(60.0, percent);      
-        LeftWing.spinFor(reverse, 175.0, degrees, true);
+        //LeftWing.spinFor(reverse, 175.0, degrees, true);
+        LeftWing.spinTo(20, deg,true);
         LeftWing.stop(); 
       }
       if(isRightWOpen())
       {
         RightWing.setVelocity(70.0, percent);
-        RightWing.spinFor(forward, 175.0, degrees, true);
+         RightWing.spinTo(-20, deg,true);
+        //RightWing.spinFor(forward, 175.0, degrees, true);
         RightWing.stop();
       }
       WingButtonPressed = false;
@@ -122,7 +126,7 @@ void event_RightWing(void){
     if(!isRightWOpen())
     {
       RightWing.setVelocity(70.0, percent);
-      RightWing.spinFor(reverse, 175.0, degrees, true);
+      RightWing.spinTo(-140, deg,true);
       RightWing.stop();
     }
     RWingButtonPressed = true;
@@ -131,7 +135,7 @@ void event_RightWing(void){
     if(isRightWOpen())
     {
       RightWing.setVelocity(70.0, percent);
-      RightWing.spinFor(forward, 175.0, degrees, true);
+      RightWing.spinTo(-20, deg,true);
       RightWing.stop();
     }
     RWingButtonPressed = false;
@@ -288,6 +292,13 @@ void outake_on(void){
   RIntake.spin(forward);
 }
 
+void intake_on(void){
+  LIntake.setVelocity(100, pct);
+  RIntake.setVelocity(100, pct);
+  LIntake.spin(forward);
+  RIntake.spin(reverse);
+}
+
 void Arm_Move(void){
   Arm.setVelocity(80, pct);
   Arm.setMaxTorque(100, pct);
@@ -381,12 +392,16 @@ void auto_own(void){
   wait(20,msec);
   Arm.spinToPosition(80, deg, false);
   wait(20,msec);
-  drive_backward(115, 4, speedMax);
-  exit(0);
-
+  // drive_backward(115, 4.5, speedMax);
+  drive_backward(60, 4.5, speedMax);
+  wait(20,msec);
+  turn_left(10, 4,8);
+  wait(20,msec);
+  drive_backward(55, 4.5, speedMax); 
 
 }
 
+/*
 void auto_own_alone(void){
   int speedMin = 2;
   int speedMax = 7;
@@ -403,6 +418,35 @@ void auto_own_alone(void){
   wait(20,msec);
   drive_backward(67, speedMin, speedMax);
 }
+*/
+
+
+void auto_opposite_prototype(void){
+  int speedMin = 2;
+  int speedMax = 7;
+  int turnSpeedMin = 2;
+  int turnSpeedMax = 6;
+  drive_backward(120, 5, speedMax);
+  wait(20, msec);
+  turn_left(90, 3, turnSpeedMax);
+  wait(20, msec);
+  drive_forward(7, 4, speedMax);
+  wait(20, msec);
+  outake_on();
+  drive_forward(3, 4, speedMax);
+  wait(300,msec);
+  outake_off();
+  drive_backward(80, 4.5, speedMax);
+  event_Wings();
+  wait(20, msec);
+  drive_forward(50, speedMin, speedMax);
+  event_Wings();
+  drive_backward(10, 4, speedMax);
+  wait(20, msec);
+  turn_right(45, turnSpeedMin, turnSpeedMax);
+  wait(20, msec);
+  drive_backward(40, speedMin, speedMax);
+}
 
 
 void auto_opposite(void){
@@ -410,39 +454,28 @@ void auto_opposite(void){
   int speedMax = 7;
   int turnSpeedMin = 2;
   int turnSpeedMax = 6;
-  drive_backward(120, speedMin, speedMax);
+  drive_backward(120, 4, speedMax);
   wait(20, msec);
-  turn_left(90, turnSpeedMin, turnSpeedMax);
+  turn_left(90, 3, turnSpeedMax);
   wait(20, msec);
-  outake_on();
-  wait(40,msec);
-  push();  
-  wait(40,msec); 
-  drive_backward(10, speedMin, speedMax);
-  outake_off();
-  wait(20,msec);
-  turn_left(45, turnSpeedMin, turnSpeedMax);
-  wait(20,msec);
-  Arm.spinTo(130, deg, false);
-  drive_backward(89,speedMin, speedMax);
-}
-
-void coolAuton(void){
-  int speedMin = 2;
-  int speedMax = 7;
-  int turnSpeedMin = 2;
-  int turnSpeedMax = 6;
-  drive_forward(75, 6, speedMax);
-  wait(20, msec);
-  turn_right(45, 4, turnSpeedMax);
+  drive_forward(7, 4, speedMax);
   wait(20, msec);
   outake_on();
-  wait(100, msec);
-  push();
-  push();
+  drive_forward(3, 4, speedMax);
+  wait(300,msec);
   outake_off();
-}
+  drive_backward(40, 3, speedMax);
+  wait(20, msec);
+  event_Wings();
+  turn_right(90, 3, turnSpeedMax);
+  wait(20, msec);
+  event_Wings();
+  wait(20, msec);
+  turn_right(90, 3, turnSpeedMax);
+  wait(20, msec);
+  drive_backward(45, 4.5, speedMax);
 
+}
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -459,10 +492,9 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  //auto_opposite();
-  auto_own();
+  auto_opposite();
+  //auto_own();
   //auto_own_alone();
-  //coolAuton();
   }
 
 
