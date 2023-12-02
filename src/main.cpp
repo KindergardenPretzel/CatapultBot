@@ -390,14 +390,14 @@ void auto_own(void){
   wait(20,msec);
   turn_left(125, turnSpeedMin, turnSpeedMax);
   wait(20,msec);
-  Arm.spinToPosition(80, deg, false);
+  Arm.spinToPosition(90, deg, false);
   wait(20,msec);
   // drive_backward(115, 4.5, speedMax);
-  drive_backward(60, 4.5, speedMax);
+  drive_backward(75, 4.5, speedMax);
   wait(20,msec);
-  turn_left(10, 4,8);
+  turn_left(5, 4,8);
   wait(20,msec);
-  drive_backward(55, 4.5, speedMax); 
+  drive_backward(38, 4.5, speedMax); 
 
 }
 
@@ -473,6 +473,7 @@ void auto_opposite(void){
   wait(20, msec);
   turn_right(90, 3, turnSpeedMax);
   wait(20, msec);
+  event_Wings();
   drive_backward(45, 4.5, speedMax);
 
 }
@@ -492,8 +493,8 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  auto_opposite();
-  //auto_own();
+  //auto_opposite();
+  auto_own();
   //auto_own_alone();
   }
 
