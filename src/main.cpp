@@ -368,13 +368,17 @@ void auto_own(void){
   drive_backward(120, speedMin, speedMax);
   wait(20, msec);
   turn_right(90, turnSpeedMin, turnSpeedMax);
-  wait(20, msec);
-  drive_forward(7, 4, speedMax);
+  outake_on();
+  wait(300, msec);
+  drive_forward(7, 5, speedMax);
+  /*
   wait(20, msec);
   outake_on();
   drive_forward(3, 4, speedMax);
   wait(300,msec);
   outake_off();
+  */
+  /*
   wait(20,msec);
   drive_backward(10, 6, speedMax);
   wait(20,msec);
@@ -398,7 +402,7 @@ void auto_own(void){
   turn_left(5, 4,8);
   wait(20,msec);
   drive_backward(38, 4.5, speedMax); 
-
+  */
 }
 
 /*
@@ -458,23 +462,32 @@ void auto_opposite(void){
   wait(20, msec);
   turn_left(90, 3, turnSpeedMax);
   wait(20, msec);
-  drive_forward(7, 4, speedMax);
-  wait(20, msec);
   outake_on();
-  drive_forward(3, 4, speedMax);
-  wait(300,msec);
+  wait(10,msec); 
+  drive_backward(30, 3, speedMax);
   outake_off();
-  drive_backward(40, 3, speedMax);
   wait(20, msec);
   event_Wings();
-  turn_right(90, 3, turnSpeedMax);
+  turn_right(110, 3, turnSpeedMax);
   wait(20, msec);
-  event_Wings();
+  event_Wings();  
   wait(20, msec);
-  turn_right(90, 3, turnSpeedMax);
+  turn_right(30, 3, turnSpeedMax);
   wait(20, msec);
-  event_Wings();
-  drive_backward(45, 4.5, speedMax);
+  intake_on();
+  drive_forward(40, 5, speedMax);
+  wait(20,msec);
+  turn_left(160, 3, turnSpeedMax);
+  wait(10,msec);
+  outake_on();
+  wait(300,msec);
+  turn_right(170, 4, turnSpeedMax); 
+  outake_off();
+  event_RightWing();
+  wait(20,msec);
+  drive_backward(75, 10, 10);
+  //event_Wings();
+  //drive_backward(45, 4.5, speedMax);
 
 }
 
@@ -493,8 +506,8 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  //auto_opposite();
-  auto_own();
+  auto_opposite();
+  //auto_own();
   //auto_own_alone();
   }
 
