@@ -371,14 +371,8 @@ void auto_own(void){
   outake_on();
   wait(300, msec);
   drive_forward(7, 5, speedMax);
-  /*
-  wait(20, msec);
-  outake_on();
-  drive_forward(3, 4, speedMax);
   wait(300,msec);
   outake_off();
-  */
-  /*
   wait(20,msec);
   drive_backward(10, 6, speedMax);
   wait(20,msec);
@@ -402,54 +396,41 @@ void auto_own(void){
   turn_left(5, 4,8);
   wait(20,msec);
   drive_backward(38, 4.5, speedMax); 
-  */
 }
-
-/*
-void auto_own_alone(void){
-  int speedMin = 2;
-  int speedMax = 7;
-  int turnSpeedMin = 2;
-  int turnSpeedMax = 6;
-  drive_backward(120, speedMin, speedMax);
-  wait(20, msec);
-  turn_right(90, turnSpeedMin, turnSpeedMax);
-  wait(20, msec);
-  outake_on();
-  wait(20,msec);
-  push();
-  outake_off();
-  wait(20,msec);
-  drive_backward(67, speedMin, speedMax);
-}
-*/
-
 
 void auto_opposite_prototype(void){
-  int speedMin = 2;
+ int speedMin = 2;
   int speedMax = 7;
   int turnSpeedMin = 2;
   int turnSpeedMax = 6;
-  drive_backward(120, 5, speedMax);
+  drive_backward(120, 7, speedMax);
   wait(20, msec);
-  turn_left(90, 3, turnSpeedMax);
-  wait(20, msec);
-  drive_forward(7, 4, speedMax);
+  turn_left(90, 5, turnSpeedMax);
   wait(20, msec);
   outake_on();
-  drive_forward(3, 4, speedMax);
-  wait(300,msec);
+  wait(10,msec); 
+  drive_backward(30, 7, speedMax);
   outake_off();
-  drive_backward(80, 4.5, speedMax);
+  wait(20, msec);
   event_Wings();
+  turn_right(110, 5, turnSpeedMax);
   wait(20, msec);
-  drive_forward(50, speedMin, speedMax);
-  event_Wings();
-  drive_backward(10, 4, speedMax);
+  event_Wings();  
   wait(20, msec);
-  turn_right(45, turnSpeedMin, turnSpeedMax);
+  turn_right(30, 5, turnSpeedMax);
   wait(20, msec);
-  drive_backward(40, speedMin, speedMax);
+  intake_on();
+  drive_forward(40, 7, speedMax);
+  wait(20,msec);
+  turn_left(160, 5, turnSpeedMax);
+  wait(10,msec);
+  outake_on();
+  wait(300,msec);
+  turn_right(170, 5, turnSpeedMax); 
+  outake_off();
+  event_RightWing();
+  wait(20,msec);
+  drive_backward(75, 10, 10);
 }
 
 
@@ -486,9 +467,12 @@ void auto_opposite(void){
   event_RightWing();
   wait(20,msec);
   drive_backward(75, 10, 10);
-  //event_Wings();
-  //drive_backward(45, 4.5, speedMax);
 
+}
+
+void skills()
+{
+  spinFor(35,sec,80,pct);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -506,8 +490,8 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  auto_opposite();
-  //auto_own();
+  //auto_opposite_prototype();
+  auto_own();
   //auto_own_alone();
   }
 
