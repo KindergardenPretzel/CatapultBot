@@ -472,7 +472,7 @@ void auto_opposite(void){
 
 void skills()
 {
-  spinFor(35,sec,80,pct);
+  //spinFor(35,sec,80,pct);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -490,8 +490,8 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  //auto_opposite_prototype();
-  auto_own();
+  auto_opposite();
+  //auto_own();
   //auto_own_alone();
   }
 
