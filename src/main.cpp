@@ -472,7 +472,23 @@ void auto_opposite(void){
 
 void skills()
 {
-  //spinFor(35,sec,80,pct);
+  Shooter.setVelocity(-80,vex::pct);
+  Shooter.spinFor(5,vex::seconds);
+  drive_backward(20,4,7);
+  wait(20,msec);
+  turn_right(40,3,7);
+  wait(20,msec);
+  drive_backward(40,4,7);
+  wait(20,msec);
+  turn_left(8,3,7);
+  wait(20,msec);
+  drive_backward(170,5,8);
+  wait(20,msec);
+  turn_left(105,3,7);
+  wait(20,msec);
+  drive_backward(105,3,7);
+  wait(20,msec);
+  turn_right(70,3,7);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -490,9 +506,10 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
-  auto_opposite();
+  //auto_opposite();
   //auto_own();
   //auto_own_alone();
+  skills();
   }
 
 
