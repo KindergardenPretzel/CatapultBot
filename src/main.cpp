@@ -473,22 +473,27 @@ void auto_opposite(void){
 void skills()
 {
   Shooter.setVelocity(-80,vex::pct);
-  Shooter.spinFor(5,vex::seconds);
+  Shooter.spinFor(35,vex::seconds);
   drive_backward(20,4,7);
   wait(20,msec);
   turn_right(40,3,7);
   wait(20,msec);
   drive_backward(40,4,7);
   wait(20,msec);
-  turn_left(8,3,7);
+  turn_left(12,3,7);
   wait(20,msec);
-  drive_backward(170,5,8);
+  drive_backward(160,5,8);
   wait(20,msec);
-  turn_left(105,3,7);
+  turn_left(120,3,7);
   wait(20,msec);
-  drive_backward(105,3,7);
+  drive_backward(111,3,7);
   wait(20,msec);
-  turn_right(70,3,7);
+  event_RightWing();
+  wait(20,msec);
+  turn_right(75,3,7);
+  wait(20,msec); 
+  drive_backward(60,5,7);
+
 }
 
 /*---------------------------------------------------------------------------*/
