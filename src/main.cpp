@@ -24,7 +24,7 @@ motor MotorRF = motor(PORT11, ratio18_1, false); // forward direction
 motor MotorRB = motor(PORT12, ratio18_1, false); // forward direction
 motor Shooter = motor(PORT4, ratio36_1, false);
 motor LeftWing = motor(PORT6, ratio18_1, false);
-motor RightWing = motor(PORT7, ratio18_1, false);
+motor RightWing = motor(PORT3, ratio18_1, false);
 motor LIntake = motor(PORT1, ratio18_1, false);
 motor RIntake = motor(PORT2, ratio18_1, false);
 motor Arm = motor(PORT8, ratio36_1, false);
@@ -74,12 +74,12 @@ bool isLeftWOpen(){
 }
 
 
-void push(){
+void push(int time){
  LeftMotors.setVelocity(60,pct);
  RightMotors.setVelocity(60,pct);
- LeftMotors.spin(forward);
- RightMotors.spin(forward);
- wait(300,msec);
+ LeftMotors.spin(reverse);
+ RightMotors.spin(reverse);
+ wait(time,sec);
  LeftMotors.stop();
  RightMotors.stop();
 }
@@ -473,7 +473,8 @@ void auto_opposite(void){
 void skills()
 {
   Shooter.setVelocity(-80,vex::pct);
-  Shooter.spinFor(35,vex::seconds);
+  Shooter.spinFor(0,vex::seconds);
+  // position to the bar
   drive_backward(20,4,7);
   wait(20,msec);
   turn_right(40,3,7);
@@ -482,18 +483,28 @@ void skills()
   wait(20,msec);
   turn_left(12,3,7);
   wait(20,msec);
-  drive_backward(160,5,8);
+  // drive under the bar
+  drive_backward(160,5,9);
+
+  // position to the net
   wait(20,msec);
   turn_left(120,3,7);
   wait(20,msec);
-  drive_backward(111,3,7);
-  wait(20,msec);
-  event_RightWing();
-  wait(20,msec);
-  turn_right(75,3,7);
-  wait(20,msec); 
-  drive_backward(60,5,7);
 
+  // drive to the net
+  drive_backward(115,5,9);
+  wait(20,msec);
+  turn_right(110,4,7);
+  //scoring
+  event_Wings();
+  wait(20,msec); 
+  push(2);
+  wait(20,msec);
+  drive_forward(70,3,7);
+  wait(20,msec); 
+  turn_left(40,3,7);
+  wait(20,msec); 
+  push(2);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -501,7 +512,7 @@ void skills()
 /*                              Autonomous Task                              */
 /*                                                                           */
 /*  This task is used to control your robot during the autonomous phase of   */
-/*  a VEX Competition.*/
+/*  a VEX Competition.                                        */
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
@@ -513,7 +524,6 @@ void autonomous(void) {
   vex::task MyTask(ShowMeInfo);
   //auto_opposite();
   //auto_own();
-  //auto_own_alone();
   skills();
   }
 
@@ -538,6 +548,9 @@ void usercontrol(void) {
   wait(15, msec);
   // User control code here, inside the loop
   while (1) {
+    //RightMotors.setVelocity(-1*(Controller1.Axis3.position() - -1*Controller1.Axis1.position()), percent);
+    //LeftMotors.setVelocity(-1*(-1*Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
+       
     RightMotors.setVelocity((Controller1.Axis3.position() - Controller1.Axis1.position()), percent);
     LeftMotors.setVelocity((Controller1.Axis1.position() + Controller1.Axis3.position()), percent);
     RightMotors.spin(forward);
