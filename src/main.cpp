@@ -144,7 +144,7 @@ void event_RightWing(void){
 
 void event_Catapult(void){
       if (!ShootButtonPressed) {
-        Shooter.setVelocity(80.0, percent);
+        Shooter.setVelocity(100.0, percent);
         Shooter.spin(reverse);
         ShootButtonPressed = true;
       }
@@ -464,7 +464,7 @@ void auto_opposite(void){
   wait(300,msec);
   turn_right(170, 4, turnSpeedMax); 
   outake_off();
-  event_RightWing();
+  event_Wings();
   wait(20,msec);
   drive_backward(75, 10, 10);
 
@@ -472,20 +472,20 @@ void auto_opposite(void){
 
 void skills()
 {
-  Shooter.setVelocity(-80,vex::pct);
-  Shooter.spinFor(0,vex::seconds);
+  Shooter.setVelocity(-100,vex::pct);
+  Shooter.spinFor(43,vex::seconds);
   // position to the bar
-  drive_backward(20,4,7);
-  wait(20,msec);
-  turn_right(40,3,7);
-  wait(20,msec);
-  drive_backward(40,4,7);
-  wait(20,msec);
-  turn_left(12,3,7);
-  wait(20,msec);
+  
+  //drive_backward(20,4,7);
+  //wait(20,msec);
+  turn_right(40,6,6);
+  wait(30,msec); 
+  drive_backward(43,8,8);  
+  wait(30,msec);  
+  turn_left(13,6,6);
+  wait(50,msec);  
   // drive under the bar
-  drive_backward(160,5,9);
-
+  drive_backward(205,7,9);
   // position to the net
   wait(20,msec);
   turn_left(120,3,7);
@@ -523,8 +523,8 @@ void autonomous(void) {
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
   //auto_opposite();
-  //auto_own();
-  skills();
+  auto_own();
+  //skills();
   }
 
 
