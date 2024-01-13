@@ -75,10 +75,10 @@ bool isLeftWOpen(){
 
 
 void push(int time){
- LeftMotors.setVelocity(60,pct);
- RightMotors.setVelocity(60,pct);
- LeftMotors.spin(reverse);
+ LeftMotors.setVelocity(65,pct);
+ RightMotors.setVelocity(65,pct);
  RightMotors.spin(reverse);
+ LeftMotors.spin(reverse);
  wait(time,sec);
  LeftMotors.stop();
  RightMotors.stop();
@@ -472,20 +472,45 @@ void auto_opposite(void){
 
 void skills()
 {
-  Shooter.setVelocity(-100,vex::pct);
-  Shooter.spinFor(43,vex::seconds);
   // position to the bar
+  drive_backward(35, 8, 8);
+  turn_right(90,6,6);
+  drive_forward(3,4,4);
+  Shooter.setVelocity(-100,vex::pct);
+  Shooter.spinFor(42,vex::seconds);
+
   
   //drive_backward(20,4,7);
   //wait(20,msec);
   turn_right(40,6,6);
   wait(30,msec); 
-  drive_backward(43,8,8);  
+  drive_backward(41,8,8);  
+  
   wait(30,msec);  
-  turn_left(13,6,6);
-  wait(50,msec);  
+  turn_left(20,6,6);
+  wait(60,msec);  
   // drive under the bar
   drive_backward(205,7,9);
+  wait(30,msec);
+  turn_right(47,4,7);
+    wait(30,msec);
+  drive_forward(135,7,9);
+  wait(30,msec);
+  turn_left(50,6,7);
+  wait(30,msec);
+  //scoring
+  event_Wings();
+  wait(20,msec); 
+  push(2);
+  wait(20,msec);
+  drive_forward(70,3,7);
+  wait(20,msec); 
+  turn_left(40,3,7);
+  wait(20,msec); 
+  push(2);
+
+/*
+  exit(0);
   // position to the net
   wait(20,msec);
   turn_left(120,3,7);
@@ -504,7 +529,7 @@ void skills()
   wait(20,msec); 
   turn_left(40,3,7);
   wait(20,msec); 
-  push(2);
+  push(2); */
 }
 
 /*---------------------------------------------------------------------------*/
@@ -523,8 +548,8 @@ void autonomous(void) {
   // ..........................................................................
   vex::task MyTask(ShowMeInfo);
   //auto_opposite();
-  auto_own();
-  //skills();
+  //auto_own();
+  skills();
   }
 
 
