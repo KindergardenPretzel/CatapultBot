@@ -477,21 +477,21 @@ void skills()
   turn_right(90,6,6);
   drive_forward(3,4,4);
   Shooter.setVelocity(-100,vex::pct);
-  Shooter.spinFor(42,vex::seconds);
+  Shooter.spinFor(43,vex::seconds);
 
+  // positioning after shooting
   turn_right(40,6,6);
   wait(30,msec); 
   drive_backward(42,8,8);   // was 41 day before competition
-  
   wait(60,msec);  // was 30 day before competition
-
-  turn_left(20,6,6);
+  turn_left(18,5,6);
   wait(60,msec);  
+
   // drive under the bar
   drive_backward(205,7,9);
   wait(30,msec);
   turn_right(47,4,7);
-    wait(30,msec);
+  wait(30,msec);
   drive_forward(135,7,9);
   wait(30,msec);
   turn_left(50,6,7);
