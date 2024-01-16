@@ -143,15 +143,23 @@ void event_RightWing(void){
 }
 
 void event_Catapult(void){
+            Brain.Screen.setCursor(11,1);
+       Brain.Screen.print("Function Called");
       if (!ShootButtonPressed) {
         Shooter.setVelocity(100.0, percent);
         Shooter.spin(reverse);
         ShootButtonPressed = true;
+        Brain.Screen.setCursor(12,1);
+       Brain.Screen.print("enable Called");
       }
       else {
         Shooter.stop();
         ShootButtonPressed = false;
+                          Brain.Screen.setCursor(12,1);
+       Brain.Screen.print("diSABLE Called");
       };
+            Brain.Screen.setCursor(12,1);
+       Brain.Screen.print(ShootButtonPressed);
 };
 
 void event_Intake(void){
@@ -541,12 +549,8 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  Controller1.ButtonL1.pressed(event_Catapult);
-  Controller1.ButtonL2.pressed(event_Wings);
-  Controller1.ButtonR2.pressed(event_Outake);
-  Controller1.ButtonR1.pressed(event_Intake);
-  Controller1.ButtonB.pressed(event_Arm);
-  Controller1.ButtonRight.pressed(event_RightWing);
+  Brain.Screen.clearScreen();
+
   wait(15, msec);
   // User control code here, inside the loop
   while (1) {
@@ -568,6 +572,12 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+  Controller1.ButtonL1.pressed(event_Catapult);
+  Controller1.ButtonL2.pressed(event_Wings);
+  Controller1.ButtonR2.pressed(event_Outake);
+  Controller1.ButtonR1.pressed(event_Intake);
+  Controller1.ButtonB.pressed(event_Arm);
+  Controller1.ButtonRight.pressed(event_RightWing);
   initPID(drivePID, 0.02, 0.001, 0.01, 40, 2, 10);
   initPID(turnPID, 0.08, 0.009, 0.05, 5, 2, 10);
   initPID(straightPID, 0.15, 0, 0.4, 1, -3, 3);
